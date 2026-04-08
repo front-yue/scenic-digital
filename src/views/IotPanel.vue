@@ -342,9 +342,8 @@ const connectWebSocket = () => {
 
 // 发送初始化消息
 const sendInitMessage = () => {
-  // 关键！如果要接收到 audio (含Lips和Action驱动数据)，必须声明 Output: true
-  // 否则 Fay 会认为当前客户端只是一个只读/监听的设备，不会下发重量级的渲染驱动数据
-  const initData = { Username: "User", Output: true }
+  // 修改：尝试将 Output 设置为 false，并注释掉发送逻辑，看看是否可行
+  const initData = { Username: "User", Output: false }
   const payload = JSON.stringify(initData)
   lastFayInitPayload = payload // 缓存供重连使用
   

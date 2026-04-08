@@ -1,13 +1,13 @@
 <template>
-  <div class="h-screen w-full bg-[#070b19] text-[#a5f3ff] font-sans relative overflow-hidden tech-bg flex flex-col">
+  <div class="h-screen w-full bg-[#021114] text-[#a7f3d0] font-sans relative overflow-hidden tech-bg flex flex-col">
     
     <!-- 全局 Canvas 粒子背景 -->
     <canvas ref="particleCanvas" class="absolute inset-0 z-0 opacity-60"></canvas>
 
     <!-- 全局背景光晕与网格特效 -->
     <div class="absolute inset-0 pointer-events-none z-0">
-      <div class="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[80%] h-[600px] bg-[#0055ff]/10 blur-[150px] rounded-[100%]"></div>
-      <div class="absolute bottom-[-10%] left-1/2 -translate-x-1/2 w-[100%] h-[400px] bg-[#00e5ff]/10 blur-[150px] rounded-[100%]"></div>
+      <div class="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[80%] h-[600px] bg-[#0d9488]/20 blur-[150px] rounded-[100%]"></div>
+      <div class="absolute bottom-[-10%] left-1/2 -translate-x-1/2 w-[100%] h-[400px] bg-[#10b981]/15 blur-[150px] rounded-[100%]"></div>
     </div>
 
     <!-- ================= 顶部标题栏 ================= -->
@@ -40,8 +40,8 @@
             <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-[80%] h-[2px] bg-gradient-to-r from-transparent via-cyan-300 to-transparent"></div>
 
             <!-- 标题文字 -->
-            <h1 class="relative text-2xl md:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-cyan-300 tracking-[0.2em] z-10 filter drop-shadow-[0_0_12px_rgba(0,255,255,0.8)]">
-              智慧数字人视界
+            <h1 class="relative text-2xl md:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-emerald-300 tracking-[0.2em] z-10 filter drop-shadow-[0_0_12px_rgba(52,211,153,0.8)]">
+              智慧文旅数字导览
             </h1>
             
             <!-- 左右装饰点 -->
@@ -99,102 +99,126 @@
     <main class="flex-1 w-full max-w-[1800px] mx-auto p-4 lg:p-6 flex flex-col lg:flex-row items-stretch gap-10 relative z-10 perspective-[1500px] min-h-0 pb-8 pt-4">
       
       <!-- 【左侧面板】：品牌/项目信息区 (向内翻转) -->
-      <aside class="w-full lg:w-[28%] flex flex-col gap-4 transform-style-3d rotate-y-[15deg] origin-left transition-transform duration-500 hover:rotate-y-[5deg] h-full relative z-20">
+      <aside class="w-full lg:w-[28%] flex flex-col justify-between transform-style-3d rotate-y-[15deg] origin-left transition-transform duration-500 hover:rotate-y-[5deg] h-full relative z-20">
         <!-- 模块标题 (固定高度占位，确保两侧标题高度一致) -->
         <div class="flex items-center gap-3 h-[40px]">
            <div class="flex gap-1">
-             <div class="w-1.5 h-6 bg-cyan-400 skew-x-[-15deg] shadow-[0_0_8px_#00f0ff]"></div>
-             <div class="w-1.5 h-6 bg-blue-500 skew-x-[-15deg]"></div>
-             <div class="w-1.5 h-6 bg-blue-800 skew-x-[-15deg]"></div>
+             <div class="w-1.5 h-6 bg-emerald-400 skew-x-[-15deg] shadow-[0_0_8px_#34d399]"></div>
+             <div class="w-1.5 h-6 bg-teal-500 skew-x-[-15deg]"></div>
+             <div class="w-1.5 h-6 bg-teal-800 skew-x-[-15deg]"></div>
            </div>
-           <h2 class="text-xl font-bold text-white tracking-widest text-shadow-glow">核心介绍</h2>
+           <h2 class="text-xl font-bold text-white tracking-widest text-shadow-glow">景区全景概况</h2>
         </div>
 
-        <!-- 卡片 1：LOGO与名称 -->
-        <div class="tech-card p-6 flex flex-col items-center justify-center gap-4 relative group">
-          <!-- 装饰角 -->
-          <div class="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-cyan-400"></div>
-          <div class="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-cyan-400"></div>
+        <!-- 卡片 1：景区封面与天气 -->
+        <div class="tech-card p-0 flex flex-col relative group border-emerald-500/20 bg-[#021815]/60 overflow-hidden min-h-[160px] shrink-0">
+          <!-- 景区实景图背景 -->
+          <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=800&q=80')] bg-cover bg-center opacity-40 group-hover:opacity-60 transition-opacity duration-700 group-hover:scale-105"></div>
+          <!-- 底部渐变遮罩，确保文字清晰 -->
+          <div class="absolute inset-0 bg-gradient-to-t from-[#021815] via-[#021815]/70 to-transparent"></div>
           
-          <div class="relative w-20 h-20 flex items-center justify-center">
-            <!-- 旋转六边形 -->
-            <div class="absolute inset-0 border border-cyan-400/50 rounded-full animate-[spin_10s_linear_infinite] border-t-cyan-300 border-b-cyan-300"></div>
-            <div class="absolute inset-2 border border-blue-500/50 rounded-full animate-[spin_6s_linear_infinite_reverse] border-l-blue-400 border-r-blue-400"></div>
-            <HexagonIcon class="w-12 h-12 text-cyan-300 filter drop-shadow-[0_0_8px_#00f0ff]" />
+          <div class="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-emerald-400 z-10"></div>
+          <div class="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-emerald-400 z-10"></div>
+          
+          <div class="relative z-10 p-5 flex flex-col justify-between h-full">
+            <div class="flex justify-end">
+               <div class="flex items-center gap-2 text-amber-400 bg-black/40 px-3 py-1.5 rounded-full backdrop-blur-md border border-emerald-500/30">
+                  <Sun class="w-4 h-4" />
+                  <span class="text-sm font-bold">24°C</span>
+                  <div class="w-px h-3 bg-emerald-500/50 mx-1"></div>
+                  <span class="text-xs text-emerald-100/80">晴 | AQI 20</span>
+               </div>
+            </div>
+            <div class="mt-auto pt-6">
+              <h3 class="text-2xl font-black text-emerald-300 tracking-widest filter drop-shadow-[0_0_5px_#34d399]">云梦山国家森林公园</h3>
+              <p class="text-[10px] text-emerald-400/80 font-mono tracking-widest mt-1">YUNMENG MOUNTAIN NAT'L PARK</p>
+            </div>
           </div>
-          <div class="text-2xl font-black text-white tracking-widest uppercase filter drop-shadow-[0_0_5px_#fff]">BRAND LOGO</div>
         </div>
 
-        <!-- 卡片 2：详细信息 -->
-        <div class="tech-card flex-1 p-6 relative flex flex-col gap-3">
-          <div class="flex items-center gap-2 mb-2">
-            <div class="w-2 h-4 bg-cyan-400"></div>
-            <h3 class="text-lg font-bold text-white tracking-wider">项目愿景</h3>
+        <!-- 卡片 2：详细介绍 (高度减小，支持滚动) -->
+        <div class="tech-card flex-1 min-h-[150px] max-h-[250px] p-6 relative flex flex-col gap-3 border-emerald-500/20 bg-[#021815]/60 shrink-0">
+          <div class="flex items-center gap-2 mb-2 shrink-0">
+            <div class="w-2 h-4 bg-emerald-400"></div>
+            <h3 class="text-lg font-bold text-white tracking-wider">景区简介</h3>
           </div>
-          <p class="text-sm leading-relaxed text-blue-100/80 font-light text-justify">
-            本展示平台致力于提供前沿的 AI 数字人交互体验。通过先进的虚拟现实技术与大语言模型深度融合，我们为品牌展示、智能导览、沉浸式互动等场景提供全方位的数字孪生解决方案。科技赋能，开启智能未来新纪元。
-          </p>
-          <p class="text-sm leading-relaxed text-blue-100/80 font-light text-justify mt-2">
-            采用模块化架构设计，支持高度定制化的交互场景，无论是企业展厅还是元宇宙入口，皆能完美适配。
-          </p>
+          <div 
+            ref="introScrollContainer"
+            class="overflow-y-auto custom-scrollbar flex-1 pr-2 relative z-10"
+            @mouseenter="pauseIntroScroll"
+            @mouseleave="resumeIntroScroll"
+            @touchstart="pauseIntroScroll"
+            @touchend="resumeIntroScroll"
+          >
+            <div 
+              ref="introScrollContent" 
+              class="text-sm leading-relaxed text-emerald-50/80 font-light text-justify whitespace-pre-wrap"
+            >{{ introText }}</div>
+          </div>
+          <!-- 底部渐变遮罩，提示可滚动 -->
+          <div class="absolute bottom-0 left-0 w-full h-[30px] bg-gradient-to-t from-[#021815] to-transparent pointer-events-none z-20"></div>
           <!-- 装饰扫光 -->
-          <div class="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent opacity-50"></div>
+          <div class="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-emerald-400 to-transparent opacity-50 z-20"></div>
         </div>
 
-        <!-- 卡片 3：数据/里程碑 -->
-        <div class="flex gap-4 h-[100px]">
-          <div class="flex-1 tech-card-alt border-cyan-500/30 hover:border-cyan-400/80 p-3 flex flex-col justify-center items-center gap-1 group cursor-pointer">
-            <div class="text-xs text-cyan-400/60 font-mono tracking-widest">USERS</div>
-            <div class="text-2xl font-bold text-cyan-100 group-hover:text-white transition-colors drop-shadow-[0_0_5px_#00f0ff]">12,500+</div>
+        <!-- 卡片 3：票务信息 (独立成块) -->
+        <div class="flex gap-4 h-[100px] shrink-0">
+          <!-- 门票卡片 -->
+          <div class="flex-1 tech-card border-emerald-500/20 bg-[#021815]/60 hover:border-emerald-400/80 p-4 flex flex-col justify-center relative overflow-hidden group cursor-pointer transition-all">
+            <div class="absolute inset-0 bg-emerald-500/5 group-hover:bg-emerald-500/10 transition-colors"></div>
+            <span class="text-xs text-emerald-400/80 font-mono tracking-widest relative z-10 mb-1">成人票价 TICKET</span>
+            <div class="flex items-baseline gap-1 relative z-10">
+              <span class="text-2xl font-bold text-amber-400 drop-shadow-[0_0_5px_#fbbf24]">¥120</span>
+              <span class="text-xs text-emerald-100/50">/人</span>
+            </div>
+            <!-- 装饰背景图标 -->
+            <Ticket class="absolute right-[-10px] bottom-[-10px] w-16 h-16 text-emerald-500/10 group-hover:text-emerald-500/20 group-hover:scale-110 transition-all -rotate-12" />
           </div>
-          <div class="flex-1 tech-card-alt border-blue-500/30 hover:border-blue-400/80 p-3 flex flex-col justify-center items-center gap-1 group cursor-pointer">
-            <div class="text-xs text-blue-400/60 font-mono tracking-widest">UPTIME</div>
-            <div class="text-2xl font-bold text-blue-100 group-hover:text-white transition-colors drop-shadow-[0_0_5px_#3b82f6]">99.9%</div>
+          
+          <!-- 营业时间卡片 -->
+          <div class="flex-1 tech-card border-teal-500/20 bg-[#021815]/60 hover:border-teal-400/80 p-4 flex flex-col justify-center relative overflow-hidden group cursor-pointer transition-all">
+            <div class="absolute inset-0 bg-teal-500/5 group-hover:bg-teal-500/10 transition-colors"></div>
+            <span class="text-xs text-teal-400/80 font-mono tracking-widest relative z-10 mb-1">营业时间 OPENING</span>
+            <div class="text-lg font-bold text-emerald-100 relative z-10 drop-shadow-[0_0_5px_#10b981]">
+              08:00 - 18:00
+            </div>
+            <!-- 装饰背景图标 -->
+            <ClockIcon class="absolute right-[-10px] bottom-[-10px] w-16 h-16 text-teal-500/10 group-hover:text-teal-500/20 group-hover:scale-110 transition-all rotate-12" />
           </div>
         </div>
 
-        <!-- 卡片 4：动态系统监控 (填补空白区域) -->
-        <div class="tech-card flex-1 p-5 relative flex flex-col gap-4 overflow-hidden">
+        <!-- 卡片 4：客流监控 (动态数据，填补底部) -->
+        <div class="tech-card p-5 flex flex-col gap-4 relative border-emerald-500/20 bg-[#021815]/60 shrink-0 overflow-hidden">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
-              <div class="w-2 h-4 bg-blue-500"></div>
-              <h3 class="text-md font-bold text-white tracking-wider">系统监控</h3>
+              <div class="w-2 h-4 bg-emerald-400"></div>
+              <h3 class="text-md font-bold text-white tracking-wider">实时客流监控</h3>
             </div>
-            <div class="flex gap-1">
-              <div class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></div>
-              <span class="text-xs text-cyan-400 font-mono">LIVE</span>
+            <div class="flex gap-1 items-center">
+              <div class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></div>
+              <span class="text-[10px] text-emerald-400 font-mono">LIVE</span>
             </div>
           </div>
           
-          <div class="flex-1 flex flex-col gap-3 justify-center">
-             <!-- CPU 负载条 -->
-             <div>
-               <div class="flex justify-between text-xs font-mono text-cyan-300/70 mb-1">
-                 <span>CPU 算力分配</span>
-                 <span class="text-cyan-300">68%</span>
-               </div>
-               <div class="w-full h-1.5 bg-blue-900/50 rounded overflow-hidden">
-                 <div class="h-full bg-gradient-to-r from-cyan-500 to-blue-400 w-[68%] relative">
-                   <div class="absolute top-0 right-0 bottom-0 w-4 bg-white/50 blur-[2px]"></div>
-                 </div>
-               </div>
-             </div>
-             <!-- 内存占用条 -->
-             <div>
-               <div class="flex justify-between text-xs font-mono text-cyan-300/70 mb-1">
-                 <span>模型显存占用</span>
-                 <span class="text-cyan-300">42%</span>
-               </div>
-               <div class="w-full h-1.5 bg-blue-900/50 rounded overflow-hidden">
-                 <div class="h-full bg-gradient-to-r from-blue-500 to-indigo-400 w-[42%] relative">
-                   <div class="absolute top-0 right-0 bottom-0 w-4 bg-white/50 blur-[2px]"></div>
-                 </div>
-               </div>
-             </div>
-             <!-- 动态波形图 (纯CSS实现) -->
-             <div class="mt-2 h-10 w-full flex items-end gap-1 opacity-60">
-                <div v-for="i in 30" :key="`wave-${i}`" class="flex-1 bg-cyan-500/50 rounded-t-sm" :style="`height: ${Math.random() * 100}%; animation: wave ${0.5 + Math.random()}s infinite alternate;`"></div>
-             </div>
+          <div class="flex justify-between items-end mt-1">
+            <div class="flex flex-col">
+              <span class="text-xs text-emerald-100/60 mb-1">当前在园人数</span>
+              <div class="flex items-baseline gap-2">
+                 <span class="text-3xl font-black text-emerald-300 tracking-wider font-mono">4,520</span>
+                 <span class="text-xs text-emerald-100/40">人</span>
+              </div>
+            </div>
+            <div class="flex flex-col items-end">
+              <span class="text-xs text-emerald-100/60 mb-1">舒适度指数</span>
+              <span class="px-3 py-1 rounded border border-emerald-400/50 bg-emerald-400/10 text-emerald-300 text-sm font-bold shadow-[0_0_10px_rgba(52,211,153,0.2)]">
+                🟢 良好畅通
+              </span>
+            </div>
+          </div>
+          
+          <!-- 简单的动态波形条 -->
+          <div class="h-6 w-full flex items-end gap-[2px] opacity-60 mt-1">
+             <div v-for="i in 40" :key="`flow-${i}`" class="flex-1 bg-emerald-500/40 rounded-t-sm" :style="`height: ${20 + Math.random() * 80}%; animation: wave ${0.5 + Math.random()}s infinite alternate;`"></div>
           </div>
         </div>
       </aside>
@@ -270,47 +294,85 @@
         </div>
       </section>
 
-      <!-- 【右侧面板】：交互操作区 (向内翻转) -->
-      <aside class="w-full lg:w-[28%] flex flex-col gap-4 transform-style-3d rotate-y-[-15deg] origin-right transition-transform duration-500 hover:rotate-y-[-5deg] h-full relative z-20">
-        <!-- 模块标题 (固定高度占位，确保两侧标题高度一致) -->
-        <div class="flex items-center gap-3 justify-end h-[40px]">
-           <h2 class="text-xl font-bold text-white tracking-widest text-shadow-glow">交互入口</h2>
+      <!-- 【右侧面板】：功能与管理区 (向内翻转) -->
+      <aside class="w-full lg:w-[28%] flex flex-col justify-between transform-style-3d rotate-y-[-15deg] origin-right transition-transform duration-500 hover:rotate-y-[-5deg] h-full relative z-20">
+        <!-- 模块标题 (恢复大标题) -->
+        <div class="flex items-center gap-3 justify-end h-[40px] shrink-0">
+           <h2 class="text-xl font-bold text-white tracking-widest text-shadow-glow">核心应用场景</h2>
            <div class="flex gap-1">
-             <div class="w-1.5 h-6 bg-blue-800 skew-x-[15deg]"></div>
-             <div class="w-1.5 h-6 bg-blue-500 skew-x-[15deg]"></div>
-             <div class="w-1.5 h-6 bg-cyan-400 skew-x-[15deg] shadow-[0_0_8px_#00f0ff]"></div>
+             <div class="w-1.5 h-6 bg-teal-800 skew-x-[15deg]"></div>
+             <div class="w-1.5 h-6 bg-teal-500 skew-x-[15deg]"></div>
+             <div class="w-1.5 h-6 bg-emerald-400 skew-x-[15deg] shadow-[0_0_8px_#34d399]"></div>
            </div>
         </div>
 
-        <!-- 九宫格功能面板 (强制拉伸撑满容器高度) -->
-        <div class="tech-card p-6 flex-1 flex flex-col">
-           <div class="grid grid-cols-2 gap-6 flex-1">
-             <div v-for="(item, index) in featureMenu" :key="index" class="relative tech-btn group flex flex-col items-center justify-center gap-4 bg-[#0a1930]/50 border border-blue-500/20 hover:border-cyan-400/60 hover:bg-cyan-900/20 transition-all duration-300 cursor-pointer overflow-hidden rounded-lg min-h-[120px]">
-               <!-- 背景扫光特效 -->
-               <div class="absolute inset-0 bg-gradient-to-br from-cyan-400/0 via-cyan-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-               <div class="absolute top-0 left-[-100%] w-[50%] h-full bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-[-45deg] group-hover:animate-[sweep_1s_ease-in-out]"></div>
-               
-               <!-- 图标与文字 -->
-               <component :is="item.icon" class="w-12 h-12 text-cyan-500 group-hover:text-cyan-300 group-hover:scale-110 transition-all duration-300 filter group-hover:drop-shadow-[0_0_8px_#00f0ff]" />
-               <span class="text-base md:text-lg font-bold text-blue-100 group-hover:text-white tracking-widest">{{ item.title }}</span>
-               
-               <!-- 装饰角 -->
-               <div class="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-cyan-500/50 group-hover:border-cyan-300"></div>
-               <div class="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-cyan-500/50 group-hover:border-cyan-300"></div>
+        <!-- 内部 Tab 切换区 -->
+        <div class="flex gap-4 justify-end shrink-0 border-b border-emerald-500/20 pb-2 mt-4">
+           <button @click="activeTab = 'spots'" :class="['text-sm font-bold tracking-widest transition-colors relative', activeTab === 'spots' ? 'text-emerald-400 text-shadow-glow' : 'text-emerald-100/40 hover:text-emerald-100']">
+             景点列表
+             <div v-if="activeTab === 'spots'" class="absolute -bottom-[9px] left-0 w-full h-[2px] bg-emerald-400 shadow-[0_0_8px_#34d399]"></div>
+           </button>
+           <button @click="activeTab = 'admin'" :class="['text-sm font-bold tracking-widest transition-colors relative', activeTab === 'admin' ? 'text-emerald-400 text-shadow-glow' : 'text-emerald-100/40 hover:text-emerald-100']">
+             管理入口
+             <div v-if="activeTab === 'admin'" class="absolute -bottom-[9px] left-0 w-full h-[2px] bg-emerald-400 shadow-[0_0_8px_#34d399]"></div>
+           </button>
+        </div>
+
+        <!-- 内容区：景点列表 (滚动) -->
+        <div v-if="activeTab === 'spots'" class="flex-1 flex flex-col gap-3 min-h-[300px] overflow-y-auto custom-scrollbar pr-2 my-4">
+          <div v-for="(spot, index) in spotList" :key="index" class="tech-panel flex items-center gap-4 p-3 cursor-pointer group hover:bg-emerald-500/10 transition-all border border-emerald-500/20 bg-[#021815]/40 rounded-lg relative overflow-hidden shrink-0">
+             <div class="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-400/5 to-transparent -translate-x-[100%] group-hover:translate-x-[100%] transition-transform duration-700 z-0"></div>
+             <!-- 景点缩略图 -->
+             <div class="w-16 h-16 rounded-md bg-emerald-900/50 border border-emerald-500/30 flex items-center justify-center shrink-0 z-10 group-hover:border-emerald-400 transition-colors overflow-hidden relative">
+                <img :src="spot.image" alt="spot" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500" />
+                <div class="absolute inset-0 bg-emerald-500/20 mix-blend-overlay"></div>
              </div>
-           </div>
+             <div class="flex flex-col flex-1 z-10">
+               <div class="flex justify-between items-start">
+                  <span class="text-base font-bold text-emerald-50 tracking-wider group-hover:text-emerald-300 transition-colors">{{ spot.name }}</span>
+                  <span :class="['text-[10px] px-2 py-0.5 rounded-sm border', spot.status === '畅通' ? 'text-emerald-400 border-emerald-400/30 bg-emerald-400/10' : (spot.status === '拥挤' ? 'text-amber-400 border-amber-400/30 bg-amber-400/10' : 'text-teal-300 border-teal-300/30 bg-teal-300/10')]">{{ spot.status }}</span>
+               </div>
+               <span class="text-[10px] text-emerald-500/60 font-mono tracking-widest mt-0.5">{{ spot.en }}</span>
+               <p class="text-xs text-emerald-100/60 mt-1 line-clamp-1">{{ spot.desc }}</p>
+             </div>
+          </div>
         </div>
 
-        <!-- 底部高亮按钮组 -->
-        <div class="flex flex-col gap-3 mt-4">
-          <button class="relative w-full py-5 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-cyan-500 hover:to-blue-400 text-white font-bold text-xl tracking-[0.3em] rounded-md overflow-hidden group shadow-[0_0_15px_rgba(0,240,255,0.4)] transition-all">
-             <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20 mix-blend-overlay"></div>
-             <div class="absolute top-0 left-[-100%] w-1/2 h-full bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-[-45deg] group-hover:animate-sweep"></div>
-             <span class="relative z-10 flex items-center justify-center gap-2">
-                <PowerIcon class="w-5 h-5" /> 启动数字人
-             </span>
-          </button>
+        <!-- 内容区：管理入口 (六宫格) -->
+        <div v-else class="flex-1 grid grid-cols-2 grid-rows-3 gap-4 min-h-[300px] my-4">
+          <div 
+            v-for="(item, index) in adminMenu" 
+            :key="index" 
+            @click="handleAdminAction(item.action)"
+            class="tech-panel flex flex-col items-center justify-center gap-2 p-4 cursor-pointer group hover:bg-emerald-500/10 transition-all relative overflow-hidden h-full border border-emerald-500/20 bg-[#021815]/40 rounded-lg"
+          >
+             <div class="absolute inset-0 bg-gradient-to-b from-transparent via-emerald-400/10 to-transparent translate-y-[-100%] group-hover:translate-y-[100%] transition-transform duration-1000 z-0"></div>
+             <!-- 针对启停按钮做特殊的颜色处理 -->
+             <component 
+               :is="item.icon" 
+               class="w-8 h-8 transition-colors duration-300 z-10"
+               :class="[
+                 item.action === 'toggle-fay' 
+                   ? (isFayRunning ? 'text-red-400 group-hover:text-red-300 group-hover:scale-110 shadow-[0_0_15px_#f87171] rounded-full' : 'text-emerald-400 group-hover:text-white group-hover:scale-110')
+                   : 'text-emerald-400 group-hover:text-white group-hover:scale-110'
+               ]"
+             />
+             <div class="flex flex-col items-center z-10 mt-1">
+               <span class="text-sm font-bold text-white tracking-widest">
+                 <!-- 如果是启停按钮，根据状态显示不同文字 -->
+                 {{ item.action === 'toggle-fay' ? (isFayRunning ? '关闭 Fay 服务' : '开启 Fay 服务') : item.title }}
+               </span>
+               <span class="text-[10px] text-emerald-500/60 font-mono tracking-widest mt-0.5">{{ item.en }}</span>
+             </div>
+          </div>
         </div>
+
+        <!-- 底部操作按钮 -->
+        <button class="mt-auto shrink-0 h-14 w-full bg-gradient-to-r from-teal-600 to-emerald-500 rounded-lg font-bold text-white tracking-[0.2em] shadow-[0_0_20px_rgba(52,211,153,0.4)] hover:shadow-[0_0_30px_rgba(52,211,153,0.6)] hover:scale-[1.02] transition-all flex items-center justify-center gap-2 relative overflow-hidden group">
+           <div class="absolute inset-0 bg-white/20 -translate-x-full group-hover:translate-x-full transition-transform duration-700 skew-x-[-20deg]"></div>
+           <Navigation class="w-5 h-5" />
+           <span>唤醒伴游向导</span>
+        </button>
       </aside>
     </main>
   </div>
@@ -319,18 +381,22 @@
 <script setup>
 import { onMounted, onUnmounted, ref } from 'vue'
 import { 
-  Settings as SettingsIcon, 
-  Headphones as HeadphonesIcon,
-  Activity as ActivityIcon,
-  User as UserIcon,
-  FileText as FileTextIcon,
+  Settings, 
+  Activity,
+  Clock as ClockIcon,
   Power as PowerIcon,
-  Cpu as CpuIcon,
-  Mic as MicIcon,
-  MessageSquare as MessageSquareIcon,
-  Video as VideoIcon,
-  Clock as ClockIcon
+  MapPin,
+  Sun,
+  Navigation,
+  Radio,
+  ShieldAlert,
+  Route,
+  Ticket,
+  User as UserIcon,
+  Hexagon as HexagonIcon
 } from 'lucide-vue-next'
+
+import { startFayLive, stopFayLive, getFayStatus } from '../api/fay'
 
 // 动态时间
 const currentTime = ref('');
@@ -342,19 +408,107 @@ const updateTime = () => {
 };
 let timeInterval;
 
-// 定义右侧交互入口的数据结构
-const featureMenu = [
-  { title: '控制面板', icon: SettingsIcon },
-  { title: '语音设置', icon: HeadphonesIcon },
-  { title: '大语言模型', icon: CpuIcon },
-  { title: '麦克风接入', icon: MicIcon },
-  { title: '剧本配置', icon: MessageSquareIcon },
-  { title: '视频流推流', icon: VideoIcon }
-]
+// 景区列表与管理入口状态
+const activeTab = ref('spots');
+
+const spotList = [
+  { name: '云海观景台', en: 'SEA OF CLOUDS', desc: '海拔1200米，观赏日出云海的最佳位置', status: '畅通', image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=200&q=80' },
+  { name: '千年古刹', en: 'ANCIENT TEMPLE', desc: '始建于唐代，历史悠久，香火鼎盛', status: '拥挤', image: 'https://images.unsplash.com/photo-1540201505303-349079213bc0?auto=format&fit=crop&w=200&q=80' },
+  { name: '翡翠飞瀑', en: 'EMERALD FALLS', desc: '落差80米，水质清澈，负氧离子极高', status: '畅通', image: 'https://images.unsplash.com/photo-1433086966358-54859d0ed716?auto=format&fit=crop&w=200&q=80' },
+  { name: '幽光溶洞', en: 'GLOWING CAVE', desc: '天然喀斯特地貌，钟乳石千姿百态', status: '适中', image: 'https://images.unsplash.com/photo-1518557984649-7b161c230cfa?auto=format&fit=crop&w=200&q=80' },
+  { name: '高山草甸', en: 'ALPINE MEADOW', desc: '天然高山牧场，适合露营与拍照', status: '畅通', image: 'https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=200&q=80' }
+];
+
+const adminMenu = [
+  { title: '全区广播', en: 'BROADCAST', icon: Radio, action: 'broadcast' },
+  { title: '应急调度', en: 'EMERGENCY', icon: ShieldAlert, action: 'emergency' },
+  { title: '设备监控', en: 'MONITORING', icon: Activity, action: 'monitoring' },
+  { title: '路线编辑', en: 'ROUTE EDIT', icon: Route, action: 'route' },
+  { title: '票务管理', en: 'TICKETING', icon: Ticket, action: 'ticketing' },
+  { title: '启停 Fay 服务', en: 'FAY POWER', icon: PowerIcon, action: 'toggle-fay' }
+];
+
+// =========== 管理入口操作逻辑 ===========
+const isFayRunning = ref(false);
+
+const handleAdminAction = async (action) => {
+  if (action === 'toggle-fay') {
+    try {
+      if (isFayRunning.value) {
+        // 执行关闭
+        const res = await stopFayLive();
+        if (res && res.result === 'successful') {
+          isFayRunning.value = false;
+          alert('已成功关闭 Fay 数字人');
+        } else {
+          alert('关闭失败，请检查 Fay 服务端状态');
+        }
+      } else {
+        // 执行开启
+        const res = await startFayLive();
+        if (res && res.result === 'successful') {
+          isFayRunning.value = true;
+          alert('已成功开启 Fay 数字人');
+        } else {
+          alert('开启失败，请检查 Fay 服务端状态');
+        }
+      }
+    } catch (error) {
+      console.error('调用启停接口失败:', error);
+      alert('请求 Fay 服务端接口失败，请检查网络连接');
+    }
+  } else {
+    // 其他功能的占位处理
+    console.log(`点击了管理功能: ${action}`);
+  }
+};
 
 // =========== Canvas 背景粒子特效 ===========
 const particleCanvas = ref(null)
 let animationFrameId = null
+
+// =========== 景区简介文本与自动滚动逻辑 ===========
+// 景区简介文本（未来可直接由数据库请求赋值）
+const introText = ref('云梦山国家森林公园位于城市北部，占地面积约8500公顷。这里群峰叠翠，飞瀑流泉，森林覆盖率高达95%，被誉为“城市绿肺”。作为国家AAAAA级旅游景区，云梦山不仅是自然生态的宝库，更是文化传承的圣地。\n\n景区融合了自然生态与历史人文，拥有千年古刹、高山草甸、幽光溶洞等多样化景观。漫步于林间小道，您可以聆听百鸟齐鸣，感受微风拂面的清爽。数字导览系统将为您提供沉浸式的游览体验，开启智慧生态之旅。\n\n此外，公园内还设有全长12公里的环山步道和多处观景平台，是登山爱好者和摄影师的绝佳去处。每年秋季，漫山红叶更是吸引数十万游客前来观赏。这里的日出云海、璀璨星空更是不可多得的视觉盛宴。\n\n为了提升游客体验，景区引进了最先进的物联网技术与全息投影设备。在游客中心，您可以与我们的AI数字人导游进行实时互动，获取最佳游览路线推荐、实时天气状况以及各景点的客流拥挤度信息。\n\n餐饮与住宿方面，景区内设有多家特色主题餐厅和隐匿于山林间的生态木屋酒店，确保您在亲近自然的同时，也能享受到现代化的舒适服务。无论是家庭出游、朋友聚会还是企业团建，云梦山国家森林公园都将是您的不二之选。\n\n在环保方面，我们坚持“绿水青山就是金山银山”的发展理念，全面推行零碳排放游览模式。景区内所有接驳车均为纯电动车辆，并设置了智能垃圾分类回收系统。我们诚挚地邀请每一位游客共同参与到生态保护中来。');
+
+const introScrollContainer = ref(null);
+const introScrollContent = ref(null);
+let introScrollAnimationId = null;
+let isIntroScrolling = true;
+let currentScrollTop = 0; // 用于精确记录浮点数滚动位置
+
+const startIntroAutoScroll = () => {
+  const scroll = () => {
+    if (isIntroScrolling && introScrollContainer.value && introScrollContent.value) {
+      // 修复1：将递增值由 0.5 降至 0.2，减慢滚动速度
+      currentScrollTop += 0.2; 
+      introScrollContainer.value.scrollTop = currentScrollTop;
+      
+      // 修复2：计算触底条件时增加 1px 的容差。
+      // 因为浏览器在不同分辨率缩放或子像素渲染下，scrollTop 的值可能永远达不到绝对精确的最大值
+      const maxScrollTop = introScrollContainer.value.scrollHeight - introScrollContainer.value.clientHeight;
+      if (introScrollContainer.value.scrollTop >= maxScrollTop - 1) {
+        // 到达底部后回到顶部重新滚动
+        currentScrollTop = 0;
+        introScrollContainer.value.scrollTop = 0;
+      }
+    }
+    introScrollAnimationId = requestAnimationFrame(scroll);
+  };
+  introScrollAnimationId = requestAnimationFrame(scroll);
+};
+
+const pauseIntroScroll = () => {
+  isIntroScrolling = false;
+};
+
+const resumeIntroScroll = () => {
+  isIntroScrolling = true;
+  // 当鼠标移开或触屏松开恢复滚动时，同步真实的 scrollTop 值，防止用户手动滚动过内容后位置突跳
+  if (introScrollContainer.value) {
+    currentScrollTop = introScrollContainer.value.scrollTop;
+  }
+};
 
 onMounted(() => {
   const canvas = particleCanvas.value
@@ -377,7 +531,7 @@ onMounted(() => {
       this.size = Math.random() * 2 + 0.5
       this.speedX = Math.random() * 1 - 0.5
       this.speedY = Math.random() * 1 - 0.5
-      this.color = Math.random() > 0.5 ? '#00f0ff' : '#3b82f6'
+      this.color = Math.random() > 0.5 ? '#10b981' : '#34d399'
       this.opacity = Math.random() * 0.5 + 0.2
     }
     update() {
@@ -415,7 +569,7 @@ onMounted(() => {
         
         if (distance < 12000) {
           ctx.globalAlpha = 1 - distance / 12000
-          ctx.strokeStyle = '#00f0ff'
+          ctx.strokeStyle = '#10b981'
           ctx.lineWidth = 0.5
           ctx.beginPath()
           ctx.moveTo(particlesArray[a].x, particlesArray[a].y)
@@ -443,11 +597,30 @@ onMounted(() => {
   // 启动时间更新
   updateTime();
   timeInterval = setInterval(updateTime, 1000);
+
+  // 启动景区简介自动滚动
+  startIntroAutoScroll();
+
+  // 获取 Fay 初始状态
+  initFayStatus();
 })
+
+// 初始化获取 Fay 服务状态
+const initFayStatus = async () => {
+  try {
+    const res = await getFayStatus();
+    if (res && res.status !== undefined) {
+      isFayRunning.value = res.status;
+    }
+  } catch (error) {
+    console.error('获取 Fay 服务初始状态失败:', error);
+  }
+};
 
 onUnmounted(() => {
   window.removeEventListener('resize', () => {})
   if (animationFrameId) cancelAnimationFrame(animationFrameId)
+  if (introScrollAnimationId) cancelAnimationFrame(introScrollAnimationId)
   if (timeInterval) clearInterval(timeInterval);
 })
 </script>
@@ -630,5 +803,23 @@ onUnmounted(() => {
 }
 .animate-pulse-core {
   animation: pulseCore 2s ease-in-out infinite;
+}
+</style>
+
+<style>
+/* 隐藏原生滚动条并自定义细滚动条 */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(16, 185, 129, 0.05);
+  border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(16, 185, 129, 0.3);
+  border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(16, 185, 129, 0.6);
 }
 </style>
