@@ -8,8 +8,8 @@
     <a href="https://www.mysql.com/"><img src="https://img.shields.io/badge/MySQL-Database-4479A1?logo=mysql&logoColor=white" alt="MySQL" /></a>
   </p>
   <p>
-    <a href="https://gitee.com/your-username/scenic-digital-board/stargazers"><img src="https://gitee.com/your-username/scenic-digital-board/badge/star.svg?theme=dark" alt="star" /></a>
-    <a href="https://gitee.com/your-username/scenic-digital-board/members"><img src="https://gitee.com/your-username/scenic-digital-board/badge/fork.svg?theme=dark" alt="fork" /></a>
+    <a href="https://gitee.com/fay-community/scenic-digital/stargazers"><img src="https://gitee.com/fay-community/scenic-digital/badge/star.svg?theme=dark" alt="star" /></a>
+    <a href="https://gitee.com/fay-community/scenic-digital/members"><img src="https://gitee.com/fay-community/scenic-digital/badge/fork.svg?theme=dark" alt="fork" /></a>
     <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License" /></a>
   </p>
 </div>
