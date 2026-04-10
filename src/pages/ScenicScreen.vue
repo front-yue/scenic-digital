@@ -33,7 +33,7 @@
             <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-[80%] h-[2px] bg-gradient-to-r from-transparent via-cyan-300 to-transparent"></div>
 
             <h1 class="relative text-2xl md:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-emerald-300 tracking-[0.2em] z-10 filter drop-shadow-[0_0_12px_rgba(52,211,153,0.8)]">
-              智慧文旅数字导览
+              智慧文旅数字人体验平台
             </h1>
             
             <div class="absolute left-6 w-2 h-2 bg-cyan-400 rotate-45 shadow-[0_0_8px_#00f0ff] animate-pulse"></div>

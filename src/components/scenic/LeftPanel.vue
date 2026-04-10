@@ -12,7 +12,7 @@
 
     <!-- 卡片 1：景区封面与天气 -->
     <div class="tech-card p-0 flex flex-col relative group border-emerald-500/20 bg-[#021815]/60 overflow-hidden min-h-[160px] shrink-0">
-      <div class="absolute inset-0 bg-cover bg-center opacity-40 group-hover:opacity-60 transition-opacity duration-700 group-hover:scale-105" :style="{ backgroundImage: `url(${store.scenicInfo.cover_image || 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=800&q=80'})` }"></div>
+      <div class="absolute inset-0 bg-cover bg-center opacity-40 group-hover:opacity-60 transition-opacity duration-700 group-hover:scale-105" :style="{ backgroundImage: `url(${store.scenicInfo.cover_image})` }"></div>
       <div class="absolute inset-0 bg-gradient-to-t from-[#021815] via-[#021815]/70 to-transparent"></div>
       
       <div class="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-emerald-400 z-10"></div>
@@ -22,14 +22,14 @@
         <div class="flex justify-end">
            <div class="flex items-center gap-2 text-amber-400 bg-black/40 px-3 py-1.5 rounded-full backdrop-blur-md border border-emerald-500/30">
               <Sun class="w-4 h-4" />
-              <span class="text-sm font-bold">{{ store.scenicInfo.weather_temp || '24' }}°C</span>
+              <span class="text-sm font-bold">{{ store.scenicInfo.weather_temp }}°C</span>
               <div class="w-px h-3 bg-emerald-500/50 mx-1"></div>
-              <span class="text-xs text-emerald-100/80">{{ store.scenicInfo.weather_desc || '晴' }} | AQI 20</span>
+              <span class="text-xs text-emerald-100/80">{{ store.scenicInfo.weather_desc }}</span>
            </div>
         </div>
         <div class="mt-auto pt-6">
-          <h3 class="text-2xl font-black text-emerald-300 tracking-widest filter drop-shadow-[0_0_5px_#34d399]">{{ store.scenicInfo.scenic_name || '云梦山国家森林公园' }}</h3>
-          <p class="text-[10px] text-emerald-400/80 font-mono tracking-widest mt-1">{{ store.scenicInfo.scenic_en_name || 'YUNMENG MOUNTAIN NAT\'L PARK' }}</p>
+          <h3 class="text-2xl font-black text-emerald-300 tracking-widest filter drop-shadow-[0_0_5px_#34d399]">{{ store.scenicInfo.scenic_name }}</h3>
+          <p class="text-[10px] text-emerald-400/80 font-mono tracking-widest mt-1">{{ store.scenicInfo.scenic_en_name}}</p>
         </div>
       </div>
     </div>
@@ -63,7 +63,7 @@
         <div class="absolute inset-0 bg-emerald-500/5 group-hover:bg-emerald-500/10 transition-colors"></div>
         <span class="text-xs text-emerald-400/80 font-mono tracking-widest relative z-10 mb-1">成人票价 TICKET</span>
         <div class="flex items-baseline gap-1 relative z-10">
-          <span class="text-2xl font-bold text-amber-400 drop-shadow-[0_0_5px_#fbbf24]">¥{{ store.scenicInfo.ticket_price || 120 }}</span>
+          <span class="text-2xl font-bold text-amber-400 drop-shadow-[0_0_5px_#fbbf24]">¥{{ store.scenicInfo.ticket_price}}</span>
           <span class="text-xs text-emerald-100/50">/人</span>
         </div>
         <Ticket class="absolute right-[-10px] bottom-[-10px] w-16 h-16 text-emerald-500/10 group-hover:text-emerald-500/20 group-hover:scale-110 transition-all -rotate-12" />
@@ -73,7 +73,7 @@
         <div class="absolute inset-0 bg-teal-500/5 group-hover:bg-teal-500/10 transition-colors"></div>
         <span class="text-xs text-teal-400/80 font-mono tracking-widest relative z-10 mb-1">营业时间 OPENING</span>
         <div class="text-lg font-bold text-emerald-100 relative z-10 drop-shadow-[0_0_5px_#10b981]">
-          {{ store.scenicInfo.opening_hours || '08:00 - 18:00' }}
+          {{ store.scenicInfo.opening_hours }}
         </div>
         <ClockIcon class="absolute right-[-10px] bottom-[-10px] w-16 h-16 text-teal-500/10 group-hover:text-teal-500/20 group-hover:scale-110 transition-all rotate-12" />
       </div>

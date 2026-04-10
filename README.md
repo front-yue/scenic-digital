@@ -1,41 +1,65 @@
-# 智慧文旅数字导览系统 (Scenic Digital Board)
+<div align="center">
+  <h1>智慧文旅数字人体验平台 (Scenic Digital)</h1>
+  <p>
+    <a href="https://vuejs.org/"><img src="https://img.shields.io/badge/Vue.js-3.0-4FC08D?logo=vue.js&logoColor=white" alt="Vue 3" /></a>
+    <a href="https://vitejs.dev/"><img src="https://img.shields.io/badge/Vite-Next-646CFF?logo=vite&logoColor=white" alt="Vite" /></a>
+    <a href="https://pinia.vuejs.org/"><img src="https://img.shields.io/badge/Pinia-State_Mgmt-FFE066?logo=vue.js&logoColor=black" alt="Pinia" /></a>
+    <a href="https://flask.palletsprojects.com/"><img src="https://img.shields.io/badge/Flask-Python-black?logo=flask&logoColor=white" alt="Flask" /></a>
+    <a href="https://www.mysql.com/"><img src="https://img.shields.io/badge/MySQL-Database-4479A1?logo=mysql&logoColor=white" alt="MySQL" /></a>
+  </p>
+  <p>
+    <a href="https://gitee.com/your-username/scenic-digital-board/stargazers"><img src="https://gitee.com/your-username/scenic-digital-board/badge/star.svg?theme=dark" alt="star" /></a>
+    <a href="https://gitee.com/your-username/scenic-digital-board/members"><img src="https://gitee.com/your-username/scenic-digital-board/badge/fork.svg?theme=dark" alt="fork" /></a>
+    <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License" /></a>
+  </p>
+</div>
 
-[![Vue 3](https://img.shields.io/badge/Vue.js-3.0-4FC08D?logo=vue.js&logoColor=white)](https://vuejs.org/)
-[![Vite](https://img.shields.io/badge/Vite-Next-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
-[![Flask](https://img.shields.io/badge/Flask-Python-black?logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
-[![MySQL](https://img.shields.io/badge/MySQL-Database-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com/)
-
-智慧文旅数字导览系统是一个基于 **Vue 3 + Flask + MySQL** 构建的现代化、科幻风格的大屏展示与管理平台。该项目最初作为 Fay 数字人的 IoT 中控模拟系统，现已全面重构升级为**专注于景区全景概览、实时客流监控、景点管理以及与 Fay 数字人交互**的综合性解决方案。
+智慧文旅数字人体验平台是一个基于 **Vue 3 + Pinia + Flask + MySQL** 构建的现代化、科幻风格的大屏展示与管理平台。该项目以 Fay 数字人服务和魔珐星云 3D 渲染 SDK 为核心，提供沉浸式的景区全景概览、实时客流监控、景点本地图片上传管理以及与 3D 伴游向导互动的综合性解决方案。
 
 非常适合用于：**企业展厅展示、景区游客中心大屏、政府数字化投标演示**以及**全栈开发学习参考**。
 
 ---
 
+## 📺 项目展示
+
+![平台主界面-未唤醒状态](README/01.png)
+*平台主界面（数字向导未唤醒状态）*
+
+![平台主界面-伴游数字人](README/02.png)
+*平台主界面（全息展示舱与 3D 伴游数字人）*
+
+![系统数据管理后台](README/03.png)
+*沉浸式系统数据管理控制台（支持本地图片上传）*
+
+---
+
 ## 🔥 核心特性
 
-- 🎨 **极致的科幻 UI 设计**
+- 🎨 **极致的科幻 UI 设计与组件化架构**
   - 采用 Tailwind CSS v4 构建深色科幻风格（Cyberpunk/Tech风格）。
-  - 包含复杂的 CSS 几何裁剪（Clip-path）、3D 翻转、粒子特效与光晕发光渲染。
-- 📊 **实时客流与舒适度计算**
+  - 大屏拆分为清晰的左中右三面板布局（LeftPanel / CenterPanel / RightPanel）。
+  - 包含复杂的 CSS 几何裁剪（Clip-path）、3D 翻转错落对齐、粒子特效与光晕发光渲染。
+- 📊 **实时客流与舒适度联动计算**
   - 后端动态基于各景点实时在园人数与最大承载量计算拥挤度（畅通/适中/拥挤）。
-  - 前端大屏实时联动呈现各景点的状态变化。
-- 🤖 **无缝集成 Fay 数字人**
-  - 预留数字人 3D Avatar 展位，作为大屏的视觉中心。
-  - 支持通过 API 直接唤起/关闭 Fay 核心服务，并管理麦克风/音频硬件状态。
-- ⚙️ **所见即所得的数据管理后台**
-  - 内置科幻风格的 `AdminOverlay` 弹窗。
-  - 支持一键修改景区全局基础信息（名称、介绍、票价、营业时间）。
-  - 支持景点列表的完整 CRUD（增删改查），修改后大屏数据即刻热更新。
-- 🏗 **标准化的全栈架构**
-  - **前端**：Vue 3 Composition API, Axios 拦截器封装, 多环境变量支持。
-  - **后端**：Python Flask 分层架构（Routes -> Services -> DB Utils），遵循 RESTful API 设计规范。
+  - 前端基于 Pinia 进行全局状态管理，一处修改，大屏多面板实时联动刷新。
+- 🤖 **深度集成魔珐星云与 Fay 数字人**
+  - 预留中央全息展示舱，对接魔珐星云（XmovAvatar）Web 3D 渲染 SDK。
+  - 支持通过控制台一键启动/关闭 Fay 核心大脑服务和前端 3D 渲染引擎，并能进行麦克风收音控制和伴游向导语音播报。
+- ⚙️ **所见即所得的数据管理后台与本地上传**
+  - 内置全局居中覆盖的科幻风格 `AdminOverlay` 数据控制台。
+  - 支持直接在浏览器拖拽/点击上传本地图片，Flask 后端自动生成 UUID 并提供本地静态文件服务。
+  - 支持景点列表的完整 CRUD（增删改查）和景区全局基础信息修改。
+- 🏗 **标准化的全栈工程架构**
+  - **前端**：Vue 3 组合式 API, Pinia 全局状态, Axios 拦截器封装, `@` 路径别名配置, 环境变量隔离。
+  - **后端**：Python Flask 蓝图路由分发, Service 业务逻辑层抽离, `.env` 敏感配置隔离。
 
 ---
 
 ## 🛠 技术栈
 
 ### 前端 (Frontend)
-- **核心框架**: Vue 3
+- **核心框架**: Vue 3 (Composition API)
+- **状态管理**: Pinia
 - **构建工具**: Vite
 - **样式方案**: Tailwind CSS v4
 - **网络请求**: Axios
@@ -44,7 +68,9 @@
 ### 后端 (Backend)
 - **核心框架**: Python Flask
 - **架构模式**: 蓝图 (Blueprints) 路由分发 + Service 业务逻辑层
+- **环境隔离**: python-dotenv
 - **跨域处理**: Flask-CORS
+- **文件处理**: Werkzeug (本地安全文件上传)
 - **数据库驱动**: PyMySQL
 
 ### 数据库 (Database)
@@ -54,72 +80,120 @@
 
 ## 🚀 快速开始
 
-### 1. 数据库准备
+### 1. 启动 Fay 服务 (前提条件)
+本项目依赖 Fay 数字人作为核心大脑服务，请先下载并运行 Fay：
+- **下载运行 Fay 安装包**: [百度网盘链接](https://pan.baidu.com/s/1J-W9PZQEMA49wXrWT1wOpA?pwd=kxca) (提取码: `kxca`)
+- **公共配置 config_center**（不稳定，建议更换成个人的）：`f87f8984-716e-41ea-ad86-6d9452e77256`
+
+### 2. 数据库准备
 1. 确保已安装并运行 MySQL 服务。
 2. 创建数据库并导入初始化脚本：
    ```bash
    mysql -u root -p < database/scenic_init.sql
    ```
-3. 默认将创建 `scenic` 数据库，并包含 `scenic_info`、`scenic_spots` 和 `scenic_flow` 三张表及测试数据。
 
-### 2. 后端服务启动 (Flask)
-1. 进入 `backend` 目录：
-   ```bash
-   cd backend
-   ```
-2. 安装 Python 依赖：
-   ```bash
-   pip install -r requirements.txt
-   ```
-3. 配置数据库连接：
-   修改 `backend/config.py` 中的 `SQLALCHEMY_DATABASE_URI` 或对应的 MySQL 账号密码。
-4. 启动服务 (默认端口 8888)：
-   ```bash
-   python run.py
-   ```
+### 3. 环境变量配置
+在启动之前，请确保分别配置好前端和后端的环境变量：
 
-### 3. 前端大屏启动 (Vue 3)
-1. 返回项目根目录，安装 Node 依赖：
+**后端配置 (`backend/.env`)**：
+1. 进入 `backend` 目录，复制模板文件：
    ```bash
-   npm install
+   cp .env.example .env
    ```
-2. 配置环境变量：
-   复制 `.env.example` 为 `.env`，确保配置了正确的后端地址：
-3. 启动 Vite 开发服务器：
+2. 修改 `.env` 中的数据库连接密码 `DB_PASSWORD` 及其他信息。
+
+**前端配置 (`.env`)**：
+1. 在项目根目录，复制模板文件：
    ```bash
-   npm run dev
+   cp .env.example .env
    ```
+2. 填入您的魔珐星云数字人 `VITE_XMOV_APP_ID` 和 `VITE_XMOV_APP_SECRET`。
+   > **注**：Xmov SDK 凭证的获取请进入官网 `https://c.c1nd.cn/9C9WW` 邀请码：`JHTA3EQSZP`，注册后可免费试用。
+
+### 4. 启动项目
+
+**方式一：一键启动脚本（推荐）**
+
+我们为您提供了方便的一键启动脚本，它会自动检测并安装前后端依赖，并同时启动两个服务：
+
+- **Windows 用户**:
+  直接双击根目录 `scripts` 文件夹下的 `start.bat`，或者在命令行执行：
+  ```cmd
+  .\scripts\start.bat
+  ```
+
+- **Mac / Linux 用户**:
+  在终端执行：
+  ```bash
+  bash scripts/start.sh
+  ```
+
+**方式二：手动启动（适用于调试）**
+
+**步骤1：启动后端服务**
+
+```bash
+# 进入后端目录
+cd backend
+
+# 创建Python虚拟环境（首次运行）
+python -m venv venv
+
+# 激活虚拟环境
+# Windows:
+venv\Scripts\activate
+# macOS/Linux:
+source venv/bin/activate
+
+# 安装依赖（首次运行）
+pip install -r requirements.txt
+
+# 启动后端服务
+python run.py
+```
+
+**步骤2：启动前端服务**
+
+打开新的终端窗口：
+
+```bash
+# 安装前端依赖（首次运行）
+npm install
+
+# 启动前端服务 (默认端口5173)
+npm run dev
+```
+
+**步骤3：访问应用**
+
+- 前端大屏展示: `http://localhost:5173`
+- 后端 API 服务: `http://localhost:5000`
 
 ---
 
-## � 核心目录结构
+## 📁 核心目录结构
 
 ```text
 ├── backend/                   # Python Flask 后端目录
-│   ├── app/
-│   │   ├── routes/            # 路由层 (API 接口定义)
-│   │   ├── services/          # 业务逻辑层 (CRUD 及客流计算)
-│   │   ├── utils/             # 工具类 (数据库连接、统一响应封装)
-│   │   └── __init__.py        # Flask App 工厂与蓝图注册
-│   ├── config.py              # 后端环境配置
-│   ├── requirements.txt       # Python 依赖
+│   ├── app/                   # 后端核心代码 (routes, services, utils)
+│   ├── uploads/               # 本地图片上传存储目录
+│   ├── .env.example           # 后端数据库环境变量模板
 │   └── run.py                 # 后端启动入口
 ├── database/                  # 数据库目录
 │   └── scenic_init.sql        # MySQL 初始化脚本 (包含建表与 Mock 数据)
+├── scripts/                   # 项目自动化脚本
+│   ├── start.bat              # Windows 一键启动脚本
+│   └── start.sh               # Linux/Mac 一键启动脚本
 ├── src/                       # Vue 3 前端源码
-│   ├── api/                   # Axios 请求封装 (scenic.js, fay.js)
-│   ├── components/            # Vue 组件
-│   │   └── admin/
-│   │       └── AdminOverlay.vue # 系统数据管理控制台弹窗
-│   ├── pages/                 # 页面级组件
-│   │   └── ScenicScreen.vue   # 智慧文旅大屏主页面
-│   ├── utils/                 # 前端工具类 (request 实例分发)
-│   ├── App.vue                # 根组件
+│   ├── api/                   # Axios 请求封装
+│   ├── components/            # 拆分的 Vue UI 组件 (LeftPanel, CenterPanel, RightPanel)
+│   ├── stores/                # Pinia 状态管理 (scenic.js, avatar.js)
+│   ├── pages/                 # 页面级组件 (ScenicScreen.vue)
+│   ├── utils/                 # 前端工具类 (全局 Message 提示等)
 │   └── main.js                # Vue 挂载入口
-├── .env.example               # 环境变量示例
-├── package.json               # NPM 依赖与脚本
-├── tailwind.config.js         # Tailwind 配置
-└── vite.config.js             # Vite 配置
+├── .env.example               # 前端环境变量模板 (API BaseUrl, SDK Key)
+├── jsconfig.json              # IDE 路径智能提示配置 (@ 指向 src)
+└── vite.config.js             # Vite 构建配置
 ```
 
 ---

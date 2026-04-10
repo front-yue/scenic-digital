@@ -23,6 +23,28 @@ export function stopFayLive() {
 }
 
 /**
+ * 发送消息给 Fay
+ * @param {string} msg 消息内容
+ * @param {string} username 用户名 (默认 "User")
+ * @returns {Promise<{result: string}>}
+ */
+export function sendFayMessage(msg, username = "User") {
+  const formData = new FormData();
+  formData.append('data', JSON.stringify({
+    msg,
+    username
+  }));
+  return fayRequest({
+    url: '/api/send',
+    method: 'post',
+    data: formData,
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  });
+}
+
+/**
  * 获取 Fay 服务运行状态
  * @returns {Promise<{status: boolean}>}
  */

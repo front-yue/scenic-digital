@@ -34,6 +34,7 @@ export const useAvatarStore = defineStore('avatar', () => {
           currentStatus.value = status
         },
         onVoiceStateChange(status) {
+          console.log('XmovAvatar 语音状态变化:', status)
           voiceStatus.value = status
         }
       })
@@ -60,7 +61,7 @@ export const useAvatarStore = defineStore('avatar', () => {
     }
   }
 
-  const speak = (text, speakOptions = {}) => {
+  const speak = (text, is_start = false, is_end = false) => {
     if (!sdkInstance.value || !isReady.value) {
       Message.warning('数字人尚未就绪，请稍后再试')
       return
@@ -69,7 +70,7 @@ export const useAvatarStore = defineStore('avatar', () => {
 
     try {
       if (typeof sdkInstance.value.speak === 'function') {
-        sdkInstance.value.speak(text, speakOptions)
+        sdkInstance.value.speak(text, is_start, is_end)
       } else if (typeof sdkInstance.value.sendText === 'function') {
         sdkInstance.value.sendText(text)
       }

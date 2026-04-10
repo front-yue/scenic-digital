@@ -1,15 +1,17 @@
 {
-  "name": "scenic-digital-board",
+  "name": "scenic-digital",
   "private": true,
   "version": "1.0.0",
-  "description": "Fay 智能数字人 - 物联网中控模拟系统 (纯前端 Demo)",
+  "description": "智慧文旅数字人体验平台",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "node -e \"const os=require('os'); const {execSync}=require('child_process'); if(os.platform()==='win32') { execSync('start .\\\\scripts\\\\start.bat') } else { execSync('bash ./scripts/start.sh', {stdio:'inherit'}) }\""
   },
   "dependencies": {
+    "@vueuse/core": "^14.2.1",
     "axios": "^1.14.0",
     "lucide-vue-next": "^1.0.0",
     "pinia": "^3.0.4",

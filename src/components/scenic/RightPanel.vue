@@ -30,32 +30,58 @@
       </div>
     </div>
 
-    <!-- 底部操作按钮 -->
-    <button @click="handleManualSpeak" class="mt-auto shrink-0 h-14 w-full bg-gradient-to-r from-teal-600 to-emerald-500 rounded-lg font-bold text-white tracking-[0.2em] shadow-[0_0_20px_rgba(52,211,153,0.4)] hover:shadow-[0_0_30px_rgba(52,211,153,0.6)] hover:scale-[1.02] transition-all flex items-center justify-center gap-2 relative overflow-hidden group">
-       <div class="absolute inset-0 bg-white/20 -translate-x-full group-hover:translate-x-full transition-transform duration-700 skew-x-[-20deg]"></div>
-       <Navigation class="w-5 h-5" />
-       <span>唤醒伴游向导</span>
-    </button>
+    <!-- 底部操作按钮 -> 替换为消息输入区 -->
+    <div class="mt-auto shrink-0 h-14 w-full flex relative group">
+       <input 
+          v-model="chatMessage" 
+          @keyup.enter="handleSendMessage"
+          type="text" 
+          placeholder="向 Fay 发送消息..." 
+          class="w-full h-full bg-[#021815]/80 border-2 border-emerald-500/30 rounded-lg pl-4 pr-14 text-emerald-100 tracking-wider placeholder-emerald-500/50 focus:outline-none focus:border-emerald-400 focus:shadow-[0_0_15px_rgba(52,211,153,0.3)] transition-all"
+       />
+       <button 
+          @click="handleSendMessage" 
+          :disabled="isSending || !chatMessage.trim()"
+          class="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center bg-emerald-500/20 hover:bg-emerald-500/40 rounded-md text-emerald-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+       >
+          <Send class="w-4 h-4" :class="{'animate-pulse': isSending}" />
+       </button>
+    </div>
 
   </aside>
 </template>
 
 <script setup>
-import { Navigation } from 'lucide-vue-next'
+import { ref } from 'vue'
+import { Send } from 'lucide-vue-next'
 import { useScenicStore } from '@/stores/scenic'
 import { useAvatarStore } from '@/stores/avatar'
+import { sendFayMessage } from '@/api/fay'
 import { Message } from '@/utils/message'
 
 const store = useScenicStore()
 const avatarStore = useAvatarStore()
 
-const handleManualSpeak = () => {
-  if (avatarStore.isReady) {
-    const statusText = store.overallStatus.replace(/🟢|🟡|🔴|\s/g, '')
-    const greeting = `欢迎来到${store.scenicInfo.scenic_name || '智慧文旅大屏'}，我是您的专属数字向导。当前在园人数为${store.totalVisitors}人，游览环境${statusText}。祝您游玩愉快！`
-    avatarStore.speak(greeting)
-  } else {
-    Message.warning('数字人引擎尚未就绪，请稍后再试。')
+const chatMessage = ref('')
+const isSending = ref(false)
+
+const handleSendMessage = async () => {
+  if (!chatMessage.value.trim() || isSending.value) return
+
+  isSending.value = true
+  try {
+    const res = await sendFayMessage(chatMessage.value)
+    if (res && res.result === 'successful') {
+      Message.success('消息发送成功')
+      chatMessage.value = '' // 清空输入框
+    } else {
+      Message.warning('消息发送失败')
+    }
+  } catch (error) {
+    console.error('发送消息失败:', error)
+    Message.error('服务连接异常')
+  } finally {
+    isSending.value = false
   }
 }
 </script>

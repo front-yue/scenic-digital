@@ -25,8 +25,9 @@
        </div>
        <!-- 启停 Fay 服务 -->
        <div class="relative group cursor-pointer" @click="handleToggleFay" :title="isFayRunning ? '关闭 Fay 服务' : '开启 Fay 服务'">
-          <div class="tech-hex-btn transition-colors" :class="isFayRunning ? 'border-emerald-400/50 bg-emerald-400/10 shadow-[0_0_15px_#34d399]' : 'border-cyan-400/50 bg-cyan-400/10'">
-            <PowerIcon class="w-5 h-5 transition-transform group-hover:scale-110" :class="isFayRunning ? 'text-emerald-300' : 'text-cyan-400'" />
+          <div class="tech-hex-btn transition-colors" :class="isFayRunning ? 'border-emerald-400/50 bg-emerald-400/10 shadow-[0_0_15px_#34d399]' : 'border-red-400/50 bg-red-400/10'">
+            <PowerIcon v-if="isFayRunning" class="w-5 h-5 text-emerald-300 group-hover:scale-110 transition-transform" />
+            <PowerOffIcon v-else class="w-5 h-5 text-red-400 group-hover:scale-110 transition-transform" />
           </div>
        </div>
     </div>
@@ -79,22 +80,70 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { 
   User as UserIcon,
   Mic as MicIcon,
   MicOff as MicOffIcon,
   FileText as FileTextIcon,
   Power as PowerIcon,
+  PowerOff as PowerOffIcon,
   MonitorPlay as MonitorPlayIcon
 } from 'lucide-vue-next'
 import { useAvatarStore } from '@/stores/avatar'
 import { getAudioConfig, toggleMicrophone, startFayLive, stopFayLive, getFayStatus } from '@/api/fay'
 import { Message } from '@/utils/message'
+import { useWebSocket } from '@vueuse/core'
 
 const avatarStore = useAvatarStore()
 const audioConfig = ref({ mic: false, speaker: false })
 const isFayRunning = ref(false)
+const message = ref('')
+// 接入 Fay WebSocket 监听
+const { status: wsStatus, data: wsData, send: wsSend } = useWebSocket('ws://127.0.0.1:10002', {
+  autoReconnect: {
+    retries: 5,
+    delay: 3000,
+    onFailed() {
+      console.warn('Fay WebSocket 重连失败')
+    }
+  },
+  onConnected() {
+    console.log('✅ Fay WebSocket 已成功连接 (10002端口)')
+    // 连接成功时发送初始化指令
+    const initMsg = JSON.stringify({ Output: false })
+    wsSend(initMsg)
+    console.log('📤 发送初始化消息:', initMsg)
+  },
+  onDisconnected() {
+    console.log('❌ Fay WebSocket 连接已断开')
+  }
+})
+watch(() => avatarStore.voiceStatus, (newStatus) => {
+  console.log('XmovAvatar 语音状态变化:', newStatus)
+  if (newStatus === 'end') {
+    message.value = ''
+  } else if (newStatus === 'start') {
+  }
+})
+// 监听接收到的 Fay WebSocket 消息
+watch(wsData, (newData) => {
+  if (!newData) return
+  try {
+    const msg = JSON.parse(newData)
+    console.log('📩 收到 Fay 实时消息:', msg)
+    // 解析 Fay 返回的结构并调用数字人播报
+    if (msg?.Data.Key === 'text') {
+      const text = msg.Data.Value
+      message.value += text
+      if(msg.Data.IsEnd == 1) {
+        avatarStore.speak(message.value, true, true)
+      }
+    }
+  } catch (error) {
+    console.log('📩 收到非 JSON 格式的实时消息:', newData)
+  }
+})
 
 const handleToggleMic = async () => {
   try {
@@ -150,10 +199,10 @@ const handleToggleFay = async () => {
 const handleToggleXmov = () => {
   if (avatarStore.isXmovRunning) {
     avatarStore.destroySDK()
-    Message.info('已关闭前端魔珐数字人渲染')
+    Message.info('已关闭前端Xmov数字人渲染')
   } else {
     avatarStore.initSDK()
-    Message.success('已启动前端魔珐数字人渲染，请稍候...')
+    Message.success('已启动前端Xmov数字人渲染，请稍候...')
   }
 }
 
