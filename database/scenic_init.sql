@@ -1,0 +1,78 @@
+-- ==================================================
+-- 智慧文旅大屏系统 (ScenicScreen) 数据库设计
+-- 字符集: utf8mb4
+-- ==================================================
+
+CREATE DATABASE IF NOT EXISTS `scenic` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `scenic`;
+
+
+
+-- --------------------------------------------------
+-- 2. 景区概况信息表 (scenic_info)
+-- 用途: 存储左侧面板的“景区全景概况”各个卡片模块的数据。
+-- --------------------------------------------------
+CREATE TABLE IF NOT EXISTS `scenic_info` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `scenic_name` VARCHAR(100) NOT NULL COMMENT '景区名称',
+  `scenic_en_name` VARCHAR(100) DEFAULT NULL COMMENT '景区英文名称',
+  `cover_image` VARCHAR(255) DEFAULT NULL COMMENT '景区URL',
+  `weather_temp` VARCHAR(20) DEFAULT NULL COMMENT '天气温度，如：24°C',
+  `weather_desc` VARCHAR(50) DEFAULT NULL COMMENT '天气描述，如：晴 | AQI 20',
+  `introduction` TEXT NOT NULL COMMENT '景区简介',
+  `ticket_price` DECIMAL(10,2) DEFAULT 0.00 COMMENT '票价（￥）',
+  `opening_hours` VARCHAR(50) DEFAULT NULL COMMENT '营业时间，如：08:00 - 18:00',
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='景区信息表';
+
+-- 插入默认数据
+INSERT INTO `scenic_info` (`scenic_name`, `scenic_en_name`, `cover_image`, `weather_temp`, `weather_desc`, `introduction`, `ticket_price`, `opening_hours`) VALUES 
+('云梦山国家森林公园', 'YUNMENG MOUNTAIN NAT''L PARK', 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=800&q=80', '24°C', '晴 | AQI 20', '云梦山国家森林公园位于城市北部，占地面积约8500公顷。这里群峰叠翠，飞瀑流泉，森林覆盖率高达95%，被誉为“城市绿肺”。作为国家AAAAA级旅游景区，云梦山不仅是自然生态的宝库，更是文化传承的圣地。\n\n景区融合了自然生态与历史人文，拥有千年古刹、高山草甸、幽光溶洞等多样化景观。漫步于林间小道，您可以聆听百鸟齐鸣，感受微风拂面的清爽。数字导览系统将为您提供沉浸式的游览体验，开启智慧生态之旅。\n\n此外，公园内还设有全长12公里的环山步道和多处观景平台，是登山爱好者和摄影师的绝佳去处。每年秋季，漫山红叶更是吸引数十万游客前来观赏。这里的日出云海、璀璨星空更是不可多得的视觉盛宴。\n\n为了提升游客体验，景区引进了最先进的物联网技术与全息投影设备。在游客中心，您可以与我们的AI数字人导游进行实时互动，获取最佳游览路线推荐、实时天气状况以及各景点的客流拥挤度信息。\n\n餐饮与住宿方面，景区内设有多家特色主题餐厅和隐匿于山林间的生态木屋酒店，确保您在亲近自然的同时，也能享受到现代化的舒适服务。无论是家庭出游、朋友聚会还是企业团建，云梦山国家森林公园都将是您的不二之选。\n\n在环保方面，我们坚持“绿水青山就是金山银山”的发展理念，全面推行零碳排放游览模式。景区内所有接驳车均为纯电动车辆，并设置了智能垃圾分类回收系统。我们诚挚地邀请每一位游客共同参与到生态保护中来。', 120.00, '08:00 - 18:00');
+
+
+-- --------------------------------------------------
+-- 3. 景区客流数据监控表 (scenic_flow)
+-- 用途: 存储各个子景点的实时客流人数（总人数及舒适度由后端基于这些数据动态计算返回）。
+-- --------------------------------------------------
+CREATE TABLE IF NOT EXISTS `scenic_flow` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `spot_id` INT NOT NULL COMMENT '景点ID',
+  `current_visitors` INT DEFAULT 0 COMMENT '当前在园人数',
+  `recorded_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '上报时间'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='各景点客流实时监控数据表';
+
+-- 为默认景点插入测试客流记录
+INSERT INTO `scenic_flow` (`spot_id`, `current_visitors`) VALUES 
+(1, 1200),
+(2, 850),
+(3, 400),
+(4, 980),
+(5, 300);
+
+
+-- --------------------------------------------------
+-- 4. 景点列表信息表 (scenic_spots)
+-- 用途: 存储页面右侧“核心应用场景” -> “景点列表”Tab下的数据。
+-- 说明: 景点属于景区的子级，通过 scenic_id 关联到 scenic_info。
+--      景点的拥挤状态(status)由后端通过 当前客流(scenic_flow) / max_capacity 动态计算得出。
+-- --------------------------------------------------
+CREATE TABLE IF NOT EXISTS `scenic_spots` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `scenic_id` INT NOT NULL COMMENT '景区ID',
+  `spot_name` VARCHAR(100) NOT NULL COMMENT '景点名称',
+  `en_name` VARCHAR(100) DEFAULT NULL COMMENT '景点英文名称',
+  `description` VARCHAR(255) DEFAULT NULL COMMENT '描述',
+  `image_url` VARCHAR(255) DEFAULT NULL COMMENT '景点URL',
+  `max_capacity` INT DEFAULT 1000 COMMENT '承载人数',
+  `sort_order` INT DEFAULT 0 COMMENT '排序',
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='景点列表表';
+
+INSERT INTO `scenic_spots` (`scenic_id`, `spot_name`, `en_name`, `description`, `image_url`, `max_capacity`, `sort_order`) VALUES 
+(1, '云海观景台', 'SEA OF CLOUDS', '海拔1200米，观赏日出云海的最佳位置', 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=200&q=80', 1500, 1),
+(1, '千年古刹', 'ANCIENT TEMPLE', '始建于唐代，历史悠久，香火鼎盛', 'https://images.unsplash.com/photo-1540201505303-349079213bc0?auto=format&fit=crop&w=200&q=80', 1000, 2),
+(1, '翡翠飞瀑', 'EMERALD FALLS', '落差80米，水质清澈，负氧离子极高', 'https://images.unsplash.com/photo-1433086966358-54859d0ed716?auto=format&fit=crop&w=200&q=80', 800, 3),
+(1, '幽光溶洞', 'GLOWING CAVE', '天然喀斯特地貌，钟乳石千姿百态', 'https://images.unsplash.com/photo-1518557984649-7b161c230cfa?auto=format&fit=crop&w=200&q=80', 2000, 4),
+(1, '高山草甸', 'ALPINE MEADOW', '天然高山牧场，适合露营与拍照', 'https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=200&q=80', 3000, 5);
+
+
