@@ -1,20 +1,20 @@
-from flask import request
+from flask import Blueprint, request, current_app
 from app.services.spot_service import SpotService
 from app.utils.response import ApiResponse
-from . import scenic_bp
 
+spot_bp = Blueprint('spot', __name__)
 spot_service = SpotService()
 
-@scenic_bp.route('/spots', methods=['GET'])
+@spot_bp.route('/spots', methods=['GET'])
 def get_scenic_spots():
     """获取景点及客流状态接口"""
     try:
         data = spot_service.get_scenic_spots_with_flow()
         return ApiResponse.success(data)
     except Exception as e:
-        return ApiResponse.error(str(e))
+        return ApiResponse.error(f"获取景点列表失败: {str(e)}")
 
-@scenic_bp.route('/spots', methods=['POST'])
+@spot_bp.route('/spots', methods=['POST'])
 def add_spot():
     """新增景点"""
     data = request.get_json()
@@ -24,7 +24,7 @@ def add_spot():
     except Exception as e:
         return ApiResponse.error(str(e))
 
-@scenic_bp.route('/spots/<int:spot_id>', methods=['PUT'])
+@spot_bp.route('/spots/<int:spot_id>', methods=['PUT'])
 def update_spot(spot_id):
     """更新景点信息"""
     data = request.get_json()
@@ -34,7 +34,7 @@ def update_spot(spot_id):
     except Exception as e:
         return ApiResponse.error(str(e))
 
-@scenic_bp.route('/spots/<int:spot_id>', methods=['DELETE'])
+@spot_bp.route('/spots/<int:spot_id>', methods=['DELETE'])
 def delete_spot(spot_id):
     """删除景点"""
     try:

@@ -47,7 +47,7 @@
 
     <!-- 数字人模型占位区 -->
     <div class="relative z-20 h-[65%] w-full flex flex-col items-center justify-end pb-[100px]">
-       <div id="sdk" class="w-[400px] h-[600px] flex flex-col items-center justify-center mix-blend-screen relative animate-float z-30 pointer-events-auto">
+       <div id="sdk" class="w-[550px] h-[800px] scale-110 origin-bottom flex flex-col items-center justify-center mix-blend-screen relative animate-float z-30 pointer-events-auto">
           <!-- 当 SDK 未就绪时显示占位符 -->
           <template v-if="!avatarStore.isReady">
             <UserIcon class="w-32 h-32 mb-4 opacity-70 filter drop-shadow-[0_0_15px_#00f0ff] text-cyan-300/50" />

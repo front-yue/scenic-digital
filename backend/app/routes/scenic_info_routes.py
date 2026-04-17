@@ -1,20 +1,22 @@
-from flask import request
+from flask import Blueprint, request, current_app
+import json
 from app.services.scenic_info_service import ScenicInfoService
 from app.utils.response import ApiResponse
-from . import scenic_bp
+
+scenic_info_bp = Blueprint('scenic_info', __name__)
 
 scenic_info_service = ScenicInfoService()
 
-@scenic_bp.route('/info', methods=['GET'])
+@scenic_info_bp.route('/info', methods=['GET'])
 def get_scenic_info():
-    """获取景区全局信息接口"""
+    """获取景区全局基础信息"""
     try:
         data = scenic_info_service.get_info()
         return ApiResponse.success(data)
     except Exception as e:
         return ApiResponse.error(str(e))
 
-@scenic_bp.route('/info', methods=['POST'])
+@scenic_info_bp.route('/info', methods=['POST'])
 def add_scenic_info():
     """新增景区概况"""
     data = request.get_json()
@@ -24,7 +26,7 @@ def add_scenic_info():
     except Exception as e:
         return ApiResponse.error(str(e))
 
-@scenic_bp.route('/info/<int:info_id>', methods=['PUT'])
+@scenic_info_bp.route('/info/<int:info_id>', methods=['PUT'])
 def update_scenic_info(info_id):
     """更新景区概况"""
     data = request.get_json()
@@ -34,7 +36,7 @@ def update_scenic_info(info_id):
     except Exception as e:
         return ApiResponse.error(str(e))
 
-@scenic_bp.route('/info/<int:info_id>', methods=['DELETE'])
+@scenic_info_bp.route('/info/<int:info_id>', methods=['DELETE'])
 def delete_scenic_info(info_id):
     """删除景区概况"""
     try:

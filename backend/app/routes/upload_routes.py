@@ -1,16 +1,17 @@
-from flask import request, current_app, url_for
+from flask import Blueprint, request, current_app, url_for
 import os
 import uuid
 from werkzeug.utils import secure_filename
 from app.utils.response import ApiResponse
-from . import scenic_bp
+
+upload_bp = Blueprint('upload', __name__)
 
 def allowed_file(filename):
     """检查文件扩展名是否被允许"""
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in current_app.config['ALLOWED_EXTENSIONS']
 
-@scenic_bp.route('/upload', methods=['POST'])
+@upload_bp.route('/upload', methods=['POST'])
 def upload_image():
     """
     通用图片上传接口

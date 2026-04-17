@@ -28,8 +28,16 @@ def create_app(config_class=Config):
         return ApiResponse.success(message="智慧文旅后端服务已启动 🚀")
 
     # 注册蓝图 (路由)
-    from app.routes import scenic_bp
+    from app.routes.scenic_info_routes import scenic_info_bp
+    from app.routes.spot_routes import spot_bp
+    from app.routes.upload_routes import upload_bp
+    from app.routes.map_routes import map_bp
 
-    app.register_blueprint(scenic_bp, url_prefix='/api/scenic')
+    app.register_blueprint(scenic_info_bp, url_prefix='/api/scenic')
+    app.register_blueprint(spot_bp, url_prefix='/api/scenic')
+    
+    app.register_blueprint(upload_bp, url_prefix='/api')
+    
+    app.register_blueprint(map_bp, url_prefix='/api/map')
 
     return app

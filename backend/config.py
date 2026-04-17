@@ -19,3 +19,6 @@ class Config:
     DB_USER = os.environ.get('DB_USER')
     DB_PASSWORD = os.environ.get('DB_PASSWORD')
     DB_NAME = os.environ.get('DB_NAME')
+    
+    # 高德地图配置
+    AMAP_KEY = os.getenv('AMAP_KEY', '')
