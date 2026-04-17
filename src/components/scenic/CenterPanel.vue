@@ -17,14 +17,14 @@
     <!-- 左侧悬浮挂件 -->
     <div class="absolute z-40 left-4 top-1/2 -translate-y-1/2 flex flex-col gap-4">
        <!-- 麦克风状态 -->
-       <div class="relative group cursor-pointer" @click="handleToggleMic" title="麦克风开关">
+       <div id="guide-mic-btn" class="relative group cursor-pointer" @click="handleToggleMic" title="麦克风开关">
          <div class="tech-hex-btn transition-colors" :class="audioConfig.mic ? 'border-emerald-400/50 bg-emerald-400/10' : 'border-red-400/50 bg-red-400/10'">
             <MicIcon v-if="audioConfig.mic" class="w-5 h-5 text-emerald-300 group-hover:scale-110 transition-transform" />
             <MicOffIcon v-else class="w-5 h-5 text-red-400 group-hover:scale-110 transition-transform" />
          </div>
        </div>
        <!-- 启停 Fay 服务 -->
-       <div class="relative group cursor-pointer" @click="handleToggleFay" :title="isFayRunning ? '关闭 Fay 服务' : '开启 Fay 服务'">
+       <div id="guide-fay-btn" class="relative group cursor-pointer" @click="handleToggleFay" :title="isFayRunning ? '关闭 Fay 服务' : '开启 Fay 服务'">
           <div class="tech-hex-btn transition-colors" :class="isFayRunning ? 'border-emerald-400/50 bg-emerald-400/10 shadow-[0_0_15px_#34d399]' : 'border-red-400/50 bg-red-400/10'">
             <PowerIcon v-if="isFayRunning" class="w-5 h-5 text-emerald-300 group-hover:scale-110 transition-transform" />
             <PowerOffIcon v-else class="w-5 h-5 text-red-400 group-hover:scale-110 transition-transform" />
@@ -35,20 +35,20 @@
     <!-- 右侧悬浮挂件 -->
     <div class="absolute z-40 right-4 top-1/2 -translate-y-1/2 flex flex-col gap-4">
        <!-- 获取当前位置雷达 -->
-       <div class="relative group cursor-pointer" @click="showCurrentLocation" title="当前位置雷达">
+       <div id="guide-location-btn" class="relative group cursor-pointer" @click="showCurrentLocation" title="当前位置雷达">
           <div class="tech-hex-btn transition-colors border-cyan-400/50 bg-cyan-400/10 hover:shadow-[0_0_15px_#00f0ff]">
             <MapPinIcon class="w-5 h-5 text-cyan-300 group-hover:scale-110 transition-transform" />
           </div>
        </div>
        <!-- 启停数字人渲染 -->
-       <div class="relative group cursor-pointer" @click="handleToggleXmov" :title="avatarStore.isXmovRunning ? '关闭数字人' : '开启数字人'">
+       <div id="guide-avatar-btn" class="relative group cursor-pointer" @click="handleToggleXmov" :title="avatarStore.isXmovRunning ? '关闭数字人' : '开启数字人'">
           <div class="tech-hex-btn transition-colors" :class="avatarStore.isXmovRunning ? 'border-amber-400/50 bg-amber-400/10 shadow-[0_0_15px_#fbbf24]' : 'border-cyan-400/50 bg-cyan-400/10'">
             <MonitorPlayIcon class="w-5 h-5 transition-transform group-hover:scale-110" :class="avatarStore.isXmovRunning ? 'text-amber-300' : 'text-cyan-400'" />
           </div>
        </div>
        
        <!-- 模拟地图弹窗按钮 (测试用) -->
-       <div class="relative group cursor-pointer" @click="simulateMapModal" title="模拟显示地图路径">
+       <div id="guide-map-route-btn" class="relative group cursor-pointer" @click="simulateMapModal" title="模拟显示地图路径">
           <div class="tech-hex-btn transition-colors border-fuchsia-400/50 bg-fuchsia-400/10 hover:shadow-[0_0_15px_#e879f9]">
             <span class="text-xs font-bold text-fuchsia-300">MAP</span>
           </div>
@@ -116,6 +116,8 @@ import { getGeocode } from '@/api/map'
 import { Message } from '@/utils/message'
 import { useWebSocket } from '@vueuse/core'
 import MapModal from './MapModal.vue'
+import { driver } from 'driver.js'
+import 'driver.js/dist/driver.css'
 
 const avatarStore = useAvatarStore()
 const audioConfig = ref({ mic: false, speaker: false })
@@ -282,8 +284,83 @@ const initFayStatus = async () => {
   }
 }
 
+// 初始化新手引导
+const initGuide = () => {
+  const isFirstVisit = localStorage.getItem('scenic_digital_guide_shown')
+  if (!isFirstVisit) {
+    const driverObj = driver({
+      showProgress: true,
+      animate: true,
+      allowClose: false,
+      doneBtnText: '开启探索',
+      closeBtnText: '跳过',
+      nextBtnText: '下一步',
+      prevBtnText: '上一步',
+      popoverClass: 'driverjs-theme-scifi', 
+      overlayOpacity: 0.3, 
+      steps: [
+        {
+          element: '#guide-fay-btn',
+          popover: {
+            title: '核心引擎',
+            description: '点击这里启动或关闭 Fay 数字人 AI 引擎。这是整个对话系统的大脑。',
+            side: 'right',
+            align: 'start'
+          }
+        },
+        {
+          element: '#guide-mic-btn',
+          popover: {
+            title: '语音输入',
+            description: '控制麦克风收音。当引擎启动后，你可以通过麦克风直接与数字向导对话。',
+            side: 'right',
+            align: 'start'
+          }
+        },
+        {
+          element: '#guide-avatar-btn',
+          popover: {
+            title: '全息投影',
+            description: '启动/关闭数字人的 3D 模型渲染。关闭后可节省性能，仅保留语音。',
+            side: 'left',
+            align: 'start'
+          }
+        },
+        {
+          element: '#guide-location-btn',
+          popover: {
+            title: '位置雷达',
+            description: '点击即可在地图上精准定位当前景区的具体位置。',
+            side: 'left',
+            align: 'start'
+          }
+        },
+        {
+          element: '#guide-map-route-btn',
+          popover: {
+            title: '导航模拟',
+            description: '测试按钮：模拟数字人发起路线规划时弹出的导航地图雷达。',
+            side: 'left',
+            align: 'start'
+          }
+        }
+      ],
+      onDestroyed: () => {
+        // 记录已展示，下次不再弹出
+        localStorage.setItem('scenic_digital_guide_shown', 'true')
+      }
+    })
+    
+    // 稍微延迟一下等 DOM 完全渲染好再弹出
+    setTimeout(() => {
+      driverObj.drive()
+    }, 1000)
+  }
+}
+
 onMounted(() => {
   initFayAudio()
   initFayStatus()
+  initGuide()
 })
 </script>

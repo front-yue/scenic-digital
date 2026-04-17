@@ -1,5 +1,77 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+/* ===== 自定义 driver.js 的科幻主题样式 ===== */
+.driver-popover.driverjs-theme-scifi {
+  background-color: #061226 !important;
+  border: 1px solid rgba(0, 240, 255, 0.5) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 0 30px rgba(0, 240, 255, 0.2), inset 0 0 15px rgba(0, 240, 255, 0.1) !important;
+  color: #a5f3fc !important;
+  padding: 20px !important;
+}
+
+.driverjs-theme-scifi .driver-popover-title {
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  color: #00f0ff !important;
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.8) !important;
+  letter-spacing: 1px !important;
+  margin-bottom: 12px !important;
+}
+
+.driverjs-theme-scifi .driver-popover-description {
+  font-size: 14px !important;
+  color: #93c5fd !important;
+  line-height: 1.6 !important;
+}
+
+.driverjs-theme-scifi .driver-popover-progress-text {
+  color: #22d3ee !important;
+  font-size: 12px !important;
+}
+
+.driverjs-theme-scifi .driver-popover-footer button {
+  background-color: rgba(0, 240, 255, 0.1) !important;
+  border: 1px solid rgba(0, 240, 255, 0.4) !important;
+  color: #67e8f9 !important;
+  text-shadow: none !important;
+  border-radius: 6px !important;
+  padding: 6px 12px !important;
+  transition: all 0.3s ease !important;
+}
+
+.driverjs-theme-scifi .driver-popover-footer button:hover {
+  background-color: rgba(0, 240, 255, 0.3) !important;
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.6) !important;
+  color: #fff !important;
+}
+
+.driverjs-theme-scifi .driver-popover-arrow {
+  display: block !important;
+  border-color: transparent !important;
+  border-width: 8px !important;
+}
+.driver-popover-arrow-side-right.driver-popover-arrow-align-start {
+  top:25px !important;
+}
+/* 根据箭头所在的不同方向，只修改对应的边框颜色，使其变成青色 */
+.driverjs-theme-scifi .driver-popover-arrow-side-left {
+  border-right-color: rgba(0, 240, 255, 0.5) !important;
+}
+.driverjs-theme-scifi .driver-popover-arrow-side-right {
+  border-left-color: rgba(0, 240, 255, 0.5) !important;
+}
+.driverjs-theme-scifi .driver-popover-arrow-side-top {
+  border-bottom-color: rgba(0, 240, 255, 0.5) !important;
+}
+.driverjs-theme-scifi .driver-popover-arrow-side-bottom {
+  border-top-color: rgba(0, 240, 255, 0.5) !important;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
