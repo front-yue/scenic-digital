@@ -11,6 +11,7 @@
     "start": "node -e \"const os=require('os'); const {execSync}=require('child_process'); if(os.platform()==='win32') { execSync('start .\\\\scripts\\\\start.bat') } else { execSync('bash ./scripts/start.sh', {stdio:'inherit'}) }\""
   },
   "dependencies": {
+    "@vuemap/vue-amap": "^2.1.17",
     "@vueuse/core": "^14.2.1",
     "axios": "^1.14.0",
     "lucide-vue-next": "^1.0.0",

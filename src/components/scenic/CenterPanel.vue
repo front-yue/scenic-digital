@@ -34,13 +34,23 @@
 
     <!-- 右侧悬浮挂件 -->
     <div class="absolute z-40 right-4 top-1/2 -translate-y-1/2 flex flex-col gap-4">
-       <div class="tech-hex-btn">
-          <FileTextIcon class="w-5 h-5 text-cyan-300" />
+       <!-- 获取当前位置雷达 -->
+       <div class="relative group cursor-pointer" @click="showCurrentLocation" title="当前位置雷达">
+          <div class="tech-hex-btn transition-colors border-cyan-400/50 bg-cyan-400/10 hover:shadow-[0_0_15px_#00f0ff]">
+            <MapPinIcon class="w-5 h-5 text-cyan-300 group-hover:scale-110 transition-transform" />
+          </div>
        </div>
        <!-- 启停数字人渲染 -->
        <div class="relative group cursor-pointer" @click="handleToggleXmov" :title="avatarStore.isXmovRunning ? '关闭数字人' : '开启数字人'">
           <div class="tech-hex-btn transition-colors" :class="avatarStore.isXmovRunning ? 'border-amber-400/50 bg-amber-400/10 shadow-[0_0_15px_#fbbf24]' : 'border-cyan-400/50 bg-cyan-400/10'">
             <MonitorPlayIcon class="w-5 h-5 transition-transform group-hover:scale-110" :class="avatarStore.isXmovRunning ? 'text-amber-300' : 'text-cyan-400'" />
+          </div>
+       </div>
+       
+       <!-- 模拟地图弹窗按钮 (测试用) -->
+       <div class="relative group cursor-pointer" @click="simulateMapModal" title="模拟显示地图路径">
+          <div class="tech-hex-btn transition-colors border-fuchsia-400/50 bg-fuchsia-400/10 hover:shadow-[0_0_15px_#e879f9]">
+            <span class="text-xs font-bold text-fuchsia-300">MAP</span>
           </div>
        </div>
     </div>
@@ -76,6 +86,15 @@
         <div class="absolute w-[70%] h-[30%] top-[20%] rounded-[50%] bg-gradient-to-b from-white/30 to-transparent blur-[2px]"></div>
       </div>
     </div>
+    
+    <!-- 引入地图弹窗组件 -->
+    <MapModal 
+      :visible="isMapVisible" 
+      @update:visible="isMapVisible = $event"
+      :originCoord="mapOriginCoord"
+      :destCoord="mapDestCoord"
+    />
+
   </section>
 </template>
 
@@ -83,6 +102,7 @@
 import { ref, onMounted, watch } from 'vue'
 import { 
   User as UserIcon,
+  MapPin as MapPinIcon,
   Mic as MicIcon,
   MicOff as MicOffIcon,
   FileText as FileTextIcon,
@@ -92,13 +112,20 @@ import {
 } from 'lucide-vue-next'
 import { useAvatarStore } from '@/stores/avatar'
 import { getAudioConfig, toggleMicrophone, startFayLive, stopFayLive, getFayStatus } from '@/api/fay'
+import { getGeocode } from '@/api/map'
 import { Message } from '@/utils/message'
 import { useWebSocket } from '@vueuse/core'
+import MapModal from './MapModal.vue'
 
 const avatarStore = useAvatarStore()
 const audioConfig = ref({ mic: false, speaker: false })
 const isFayRunning = ref(false)
 const message = ref('')
+
+// 地图弹窗相关状态
+const isMapVisible = ref(false)
+const mapOriginCoord = ref('')
+const mapDestCoord = ref('')
 // 接入 Fay WebSocket 监听
 const { status: wsStatus, data: wsData, send: wsSend } = useWebSocket('ws://127.0.0.1:10002', {
   autoReconnect: {
@@ -131,10 +158,11 @@ watch(wsData, (newData) => {
   if (!newData) return
   try {
     const msg = JSON.parse(newData)
-    console.log('📩 收到 Fay 实时消息:', msg)
+    // console.log('📩 收到 Fay 实时消息:', msg)
+    
     // 解析 Fay 返回的结构并调用数字人播报
     if (msg?.Data.Key === 'text') {
-      const text = msg.Data.Value
+      let text = msg.Data.Value
       message.value += text
       if(msg.Data.IsEnd == 1) {
         avatarStore.speak(message.value, true, true)
@@ -144,6 +172,43 @@ watch(wsData, (newData) => {
     console.log('📩 收到非 JSON 格式的实时消息:', newData)
   }
 })
+
+// 模拟触发地图联动功能（路线导航模式）
+const simulateMapModal = async () => {
+  console.log('模拟调用地图弹窗，请求坐标...')
+  // 调用封装的接口获取经纬度
+  const [originRes, destRes] = await Promise.all([
+    getGeocode('夹山漾小区'),
+    getGeocode('天河理想城')
+  ])
+  console.log(originRes, destRes)
+  if (originRes.code == 200 && destRes.code == 200) {
+    mapOriginCoord.value = originRes.data.location
+    mapDestCoord.value = destRes.data.location
+    isMapVisible.value = true
+  } else {
+    Message.error('无法获取起始或终点坐标')
+  }
+}
+
+// 触发当前位置雷达（单点定位模式）
+const showCurrentLocation = async () => {
+  try {
+    Message.info('正在定位当前位置...')
+    const res = await getGeocode('浙江省湖州市吴兴区 西塞山路1558号2号楼浙大科技园湖州基地2幢1406室')
+    
+    if (res && res.code == 200) {
+      mapOriginCoord.value = res.data.location
+      mapDestCoord.value = '' // 清空终点，让 MapModal 知道是单点模式
+      isMapVisible.value = true
+    } else {
+      Message.error('定位失败')
+    }
+  } catch (error) {
+    console.error('定位异常:', error)
+    Message.error('雷达系统异常')
+  }
+}
 
 const handleToggleMic = async () => {
   try {
