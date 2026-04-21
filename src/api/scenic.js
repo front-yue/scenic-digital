@@ -85,7 +85,7 @@ export const uploadImage = (file) => {
   formData.append('file', file);
   
   return scenicRequest({
-    url: '/api/scenic/upload',
+    url: '/api/upload',
     method: 'post',
     data: formData,
     headers: {

@@ -16,6 +16,12 @@
 
     <!-- 左侧悬浮挂件 -->
     <div class="absolute z-40 left-4 top-1/2 -translate-y-1/2 flex flex-col gap-4">
+       <!-- 版本信息按钮 -->
+       <div id="btn-version" class="relative group cursor-pointer" @click="isVersionVisible = true" title="版本信息">
+          <div class="tech-hex-btn transition-colors border-cyan-400/50 bg-cyan-400/10 hover:shadow-[0_0_15px_#00f0ff]">
+            <FileTextIcon class="w-5 h-5 text-cyan-300 group-hover:scale-110 transition-transform" />
+          </div>
+       </div>
        <!-- 麦克风状态 -->
        <div id="guide-mic-btn" class="relative group cursor-pointer" @click="handleToggleMic" title="麦克风开关">
          <div class="tech-hex-btn transition-colors" :class="audioConfig.mic ? 'border-emerald-400/50 bg-emerald-400/10' : 'border-red-400/50 bg-red-400/10'">
@@ -47,10 +53,10 @@
           </div>
        </div>
        
-       <!-- 模拟地图弹窗按钮 (测试用) -->
-       <div id="guide-map-route-btn" class="relative group cursor-pointer" @click="simulateMapModal" title="模拟显示地图路径">
+       <!-- 管理控制台按钮 -->
+       <div id="guide-admin-btn" class="relative group cursor-pointer" @click="openAdmin" title="数据管理控制台">
           <div class="tech-hex-btn transition-colors border-fuchsia-400/50 bg-fuchsia-400/10 hover:shadow-[0_0_15px_#e879f9]">
-            <span class="text-xs font-bold text-fuchsia-300">MAP</span>
+            <DatabaseIcon class="w-5 h-5 text-fuchsia-300 group-hover:scale-110 transition-transform" />
           </div>
        </div>
     </div>
@@ -94,32 +100,39 @@
       :originCoord="mapOriginCoord"
       :destCoord="mapDestCoord"
     />
+    
+    <!-- 引入版本信息弹窗 -->
+    <VersionModal 
+      :visible="isVersionVisible" 
+      @update:visible="isVersionVisible = $event"
+    />
+
+    <!-- 引入后台管理控制台 -->
+    <AdminOverlay 
+      :visible="isAdminVisible" 
+      @update:visible="isAdminVisible = $event"
+    />
 
   </section>
 </template>
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
-import { 
-  User as UserIcon,
-  MapPin as MapPinIcon,
-  Mic as MicIcon,
-  MicOff as MicOffIcon,
-  FileText as FileTextIcon,
-  Power as PowerIcon,
-  PowerOff as PowerOffIcon,
-  MonitorPlay as MonitorPlayIcon
-} from 'lucide-vue-next'
+import {   User as UserIcon,  MapPin as MapPinIcon,  Mic as MicIcon,  MicOff as MicOffIcon,  FileText as FileTextIcon,  Power as PowerIcon,  PowerOff as PowerOffIcon,  MonitorPlay as MonitorPlayIcon, Database as DatabaseIcon} from 'lucide-vue-next'
 import { useAvatarStore } from '@/stores/avatar'
+import { useScenicStore } from '@/stores/scenic'
 import { getAudioConfig, toggleMicrophone, startFayLive, stopFayLive, getFayStatus } from '@/api/fay'
 import { getGeocode } from '@/api/map'
 import { Message } from '@/utils/message'
 import { useWebSocket } from '@vueuse/core'
 import MapModal from './MapModal.vue'
+import VersionModal from '../common/VersionModal.vue'
+import AdminOverlay from '../admin/AdminOverlay.vue'
 import { driver } from 'driver.js'
 import 'driver.js/dist/driver.css'
 
 const avatarStore = useAvatarStore()
+const scenicStore = useScenicStore() 
 const audioConfig = ref({ mic: false, speaker: false })
 const isFayRunning = ref(false)
 const message = ref('')
@@ -128,6 +141,14 @@ const message = ref('')
 const isMapVisible = ref(false)
 const mapOriginCoord = ref('')
 const mapDestCoord = ref('')
+
+const isVersionVisible = ref(false)
+const isAdminVisible = ref(false)
+
+const openAdmin = () => {
+  isAdminVisible.value = true
+}
+
 // 接入 Fay WebSocket 监听
 const { status: wsStatus, data: wsData, send: wsSend } = useWebSocket('ws://127.0.0.1:10002', {
   autoReconnect: {
@@ -150,7 +171,7 @@ const { status: wsStatus, data: wsData, send: wsSend } = useWebSocket('ws://127.
 })
 watch(() => avatarStore.voiceStatus, (newStatus) => {
   console.log('XmovAvatar 语音状态变化:', newStatus)
-  if (newStatus === 'end') {
+  if (newStatus == 'end') {
     message.value = ''
   } else if (newStatus === 'start') {
   }
@@ -163,45 +184,59 @@ watch(wsData, (newData) => {
     // console.log('📩 收到 Fay 实时消息:', msg)
     
     // 解析 Fay 返回的结构并调用数字人播报
-    if (msg?.Data.Key === 'text') {
+    if (msg?.Data.Key == 'text') {
       let text = msg.Data.Value
       message.value += text
       if(msg.Data.IsEnd == 1) {
         avatarStore.speak(message.value, true, true)
+         // 匹配 "从【起点】到【终点】"
+        message.value = ''
+        const routeMatch = message.value.match(/从【(.*?)】到【(.*?)】/)
+        if (routeMatch) {
+          triggerMapNav(routeMatch[1], routeMatch[2])
+        }
       }
     }
   } catch (error) {
     console.log('📩 收到非 JSON 格式的实时消息:', newData)
   }
 })
-
-// 模拟触发地图联动功能（路线导航模式）
-const simulateMapModal = async () => {
-  console.log('模拟调用地图弹窗，请求坐标...')
-  // 调用封装的接口获取经纬度
+const triggerMapNav = async (origin, dest) => {
+  if(origin == "当前位置") {
+    origin = scenicStore.scenicInfo?.address
+  }
+  if(dest == "当前位置") {
+    dest = scenicStore.scenicInfo?.address
+  }
+  alert(origin + dest)
   const [originRes, destRes] = await Promise.all([
-    getGeocode('夹山漾小区'),
-    getGeocode('天河理想城')
+    getGeocode(origin),
+    getGeocode(dest)
   ])
-  console.log(originRes, destRes)
   if (originRes.code == 200 && destRes.code == 200) {
     mapOriginCoord.value = originRes.data.location
     mapDestCoord.value = destRes.data.location
     isMapVisible.value = true
-  } else {
-    Message.error('无法获取起始或终点坐标')
   }
 }
 
 // 触发当前位置雷达（单点定位模式）
 const showCurrentLocation = async () => {
   try {
+    // 从 Vuex/Pinia Store 获取后台配置的最新地理位置
+    const currentAddress = scenicStore.scenicInfo?.address
+    
+    if (!currentAddress) {
+      Message.warning('景区位置未配置，请先在管理后台设置地理位置')
+      return
+    }
+
     Message.info('正在定位当前位置...')
-    const res = await getGeocode('浙江省湖州市吴兴区 西塞山路1558号2号楼浙大科技园湖州基地2幢1406室')
+    const res = await getGeocode(currentAddress)
     
     if (res && res.code == 200) {
       mapOriginCoord.value = res.data.location
-      mapDestCoord.value = '' // 清空终点，让 MapModal 知道是单点模式
+      mapDestCoord.value = '' 
       isMapVisible.value = true
     } else {
       Message.error('定位失败')

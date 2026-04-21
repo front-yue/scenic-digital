@@ -42,113 +42,140 @@
         </aside>
 
         <!-- 右侧内容区 -->
-        <main class="flex-1 p-6 overflow-y-auto custom-scrollbar relative bg-[#021114]/50">
+        <main class="flex-1 flex flex-col relative bg-gradient-to-br from-[#020b14]/80 to-transparent overflow-hidden">
           
           <!-- ================== 景区信息管理 ================== -->
-          <div v-if="activeMenu === 'scenic'" class="max-w-4xl animate-fade-in">
-             <div class="flex justify-between items-center mb-6">
-                <h3 class="text-lg font-bold text-emerald-300 border-l-4 border-emerald-400 pl-3">景区全局配置</h3>
+          <div v-if="activeMenu === 'scenic'" class="flex-1 flex flex-col overflow-hidden animate-fade-in">
+             <!-- 固定的顶部操作栏 -->
+             <div class="flex-shrink-0 flex justify-between items-center p-6 border-b border-emerald-500/10">
+                <h3 class="text-lg font-bold text-emerald-300 border-l-4 border-emerald-400 pl-3 tracking-wider">景区全局配置</h3>
                 <button @click="handleSaveScenic" class="px-6 py-2 bg-emerald-500 hover:bg-emerald-400 text-[#021114] font-bold rounded shadow-[0_0_15px_rgba(52,211,153,0.4)] transition-all flex items-center gap-2">
                    <Save class="w-4 h-4" /> 保存修改
                 </button>
              </div>
-
-             <div v-if="loadingScenic" class="text-emerald-400/60 flex items-center gap-2">
-                <Loader2 class="w-5 h-5 animate-spin" /> 数据加载中...
-             </div>
              
-             <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="flex flex-col gap-2">
-                   <label class="text-sm text-emerald-100/70">景区中文名称</label>
-                   <input v-model="scenicForm.scenic_name" type="text" class="bg-emerald-900/20 border border-emerald-500/30 rounded px-4 py-2 text-emerald-100 focus:outline-none focus:border-emerald-400 focus:bg-emerald-900/40 transition-colors" />
-                </div>
-                <div class="flex flex-col gap-2">
-                   <label class="text-sm text-emerald-100/70">景区英文名称</label>
-                   <input v-model="scenicForm.scenic_en_name" type="text" class="bg-emerald-900/20 border border-emerald-500/30 rounded px-4 py-2 text-emerald-100 focus:outline-none focus:border-emerald-400 focus:bg-emerald-900/40 transition-colors" />
-                </div>
-                <div class="flex flex-col gap-2">
-                   <label class="text-sm text-emerald-100/70">成人票价 (元)</label>
-                   <input v-model="scenicForm.ticket_price" type="number" class="bg-emerald-900/20 border border-emerald-500/30 rounded px-4 py-2 text-emerald-100 focus:outline-none focus:border-emerald-400 focus:bg-emerald-900/40 transition-colors" />
-                </div>
-                <div class="flex flex-col gap-2">
-                   <label class="text-sm text-emerald-100/70">营业时间</label>
-                   <input v-model="scenicForm.opening_hours" type="text" placeholder="例如: 08:00 - 18:00" class="bg-emerald-900/20 border border-emerald-500/30 rounded px-4 py-2 text-emerald-100 focus:outline-none focus:border-emerald-400 focus:bg-emerald-900/40 transition-colors" />
-                </div>
-                <div class="flex flex-col gap-2 md:col-span-2">
-                   <label class="text-sm text-emerald-100/70">封面图片</label>
-                   <div 
-                     class="relative w-full h-40 rounded-lg border-2 border-dashed border-emerald-500/30 bg-emerald-900/10 overflow-hidden flex flex-col items-center justify-center cursor-pointer group hover:border-emerald-400 hover:bg-emerald-900/20 transition-all duration-300"
-                     @click="$refs.scenicFileInput.click()"
-                   >
-                     <img v-if="scenicForm.cover_image" :src="scenicForm.cover_image" class="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-700" />
-                     
-                     <!-- 遮罩层与更换提示 (有图片时) -->
-                     <div v-if="scenicForm.cover_image" class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center gap-2 z-10 backdrop-blur-[2px]">
-                        <Upload class="w-8 h-8 text-emerald-300 transform -translate-y-2 group-hover:translate-y-0 transition-transform duration-300" />
-                        <span class="text-sm font-bold tracking-widest text-emerald-300">点击更换封面图片</span>
-                     </div>
+             <!-- 可滚动的表单主体 -->
+             <div class="flex-1 overflow-y-auto p-6 custom-scrollbar">
+                <div class="max-w-4xl mx-auto pb-12">
 
-                     <!-- 初始无图片状态 -->
-                     <div v-if="!scenicForm.cover_image" class="flex flex-col items-center justify-center gap-3 z-0">
-                        <div class="p-3 rounded-full bg-emerald-500/10 group-hover:bg-emerald-500/20 transition-colors">
-                          <Upload class="w-8 h-8 text-emerald-500/60 group-hover:text-emerald-400 transition-colors" />
-                        </div>
-                        <div class="flex flex-col items-center gap-1">
-                          <span class="text-emerald-400 font-bold tracking-wide">点击上传景区封面图</span>
-                          <span class="text-[10px] text-emerald-500/50 font-mono">支持 JPG / PNG / WEBP 格式，最大 16MB</span>
-                        </div>
-                     </div>
-                     
-                     <!-- 上传中状态 -->
-                     <div v-if="uploadingScenicImg" class="absolute inset-0 bg-[#021815]/90 flex flex-col items-center justify-center gap-3 z-20 backdrop-blur-sm">
-                       <Loader2 class="w-8 h-8 text-emerald-400 animate-spin" />
-                       <span class="text-xs tracking-widest text-emerald-400 animate-pulse">UPLOADING...</span>
-                     </div>
-                     
-                     <input type="file" ref="scenicFileInput" class="hidden" accept="image/*" @change="e => handleImageUpload(e, 'scenic')" />
+                   <div v-if="loadingScenic" class="text-emerald-400/60 flex items-center gap-2">
+                      <Loader2 class="w-5 h-5 animate-spin" /> 数据加载中...
                    </div>
-                </div>
-                <div class="flex flex-col gap-2 md:col-span-2">
-                   <label class="text-sm text-emerald-100/70">景区详细介绍</label>
-                   <textarea v-model="scenicForm.introduction" rows="8" class="bg-emerald-900/20 border border-emerald-500/30 rounded px-4 py-2 text-emerald-100 focus:outline-none focus:border-emerald-400 focus:bg-emerald-900/40 transition-colors resize-none custom-scrollbar"></textarea>
+                   
+                   <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div class="flex flex-col gap-2">
+                         <label class="text-sm text-emerald-100/70">景区中文名称</label>
+                         <input v-model="scenicForm.scenic_name" type="text" class="bg-emerald-900/20 border border-emerald-500/30 rounded px-4 py-2 text-emerald-100 focus:outline-none focus:border-emerald-400 focus:bg-emerald-900/40 transition-colors" />
+                      </div>
+                      <div class="flex flex-col gap-2">
+                         <label class="text-sm text-emerald-100/70">景区英文名称</label>
+                         <input v-model="scenicForm.scenic_en_name" type="text" class="bg-emerald-900/20 border border-emerald-500/30 rounded px-4 py-2 text-emerald-100 focus:outline-none focus:border-emerald-400 focus:bg-emerald-900/40 transition-colors" />
+                      </div>
+                      <div class="flex flex-col gap-2 md:col-span-2">
+                         <label class="text-sm text-emerald-100/70">地理位置</label>
+                         <input v-model="scenicForm.address" type="text" placeholder="例如：北京市。。。" class="bg-emerald-900/20 border border-emerald-500/30 rounded px-4 py-2 text-emerald-100 focus:outline-none focus:border-emerald-400 focus:bg-emerald-900/40 transition-colors" />
+                      </div>
+                      <div class="flex flex-col gap-2">
+                         <label class="text-sm text-emerald-100/70">成人票价 (元)</label>
+                         <input v-model="scenicForm.ticket_price" type="number" class="bg-emerald-900/20 border border-emerald-500/30 rounded px-4 py-2 text-emerald-100 focus:outline-none focus:border-emerald-400 focus:bg-emerald-900/40 transition-colors" />
+                      </div>
+                      <div class="flex flex-col gap-2">
+                         <label class="text-sm text-emerald-100/70">营业时间</label>
+                         <input v-model="scenicForm.opening_hours" type="text" placeholder="例如: 08:00 - 18:00" class="bg-emerald-900/20 border border-emerald-500/30 rounded px-4 py-2 text-emerald-100 focus:outline-none focus:border-emerald-400 focus:bg-emerald-900/40 transition-colors" />
+                      </div>
+                      <div class="flex flex-col gap-2 md:col-span-2">
+                         <label class="text-sm text-emerald-100/70">封面图片</label>
+                         <div 
+                           class="relative w-full h-40 rounded-lg border-2 border-dashed border-emerald-500/30 bg-emerald-900/10 overflow-hidden flex flex-col items-center justify-center cursor-pointer group hover:border-emerald-400 hover:bg-emerald-900/20 transition-all duration-300"
+                           @click="$refs.scenicFileInput.click()"
+                         >
+                           <img v-if="scenicForm.cover_image" :src="scenicForm.cover_image" class="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-700" />
+                           
+                           <!-- 遮罩层与更换提示 (有图片时) -->
+                           <div v-if="scenicForm.cover_image" class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center gap-2 z-10 backdrop-blur-[2px]">
+                              <Upload class="w-8 h-8 text-emerald-300 transform -translate-y-2 group-hover:translate-y-0 transition-transform duration-300" />
+                              <span class="text-sm font-bold tracking-widest text-emerald-300">点击更换封面图片</span>
+                           </div>
+
+                           <!-- 初始无图片状态 -->
+                           <div v-if="!scenicForm.cover_image" class="flex flex-col items-center justify-center gap-3 z-0">
+                              <div class="p-3 rounded-full bg-emerald-500/10 group-hover:bg-emerald-500/20 transition-colors">
+                                <Upload class="w-8 h-8 text-emerald-500/60 group-hover:text-emerald-400 transition-colors" />
+                              </div>
+                              <div class="flex flex-col items-center gap-1">
+                                <span class="text-emerald-400 font-bold tracking-wide">点击上传景区封面图</span>
+                                <span class="text-[10px] text-emerald-500/50 font-mono">支持 JPG / PNG / WEBP 格式，最大 16MB</span>
+                              </div>
+                           </div>
+                           
+                           <!-- 上传中状态 -->
+                           <div v-if="uploadingScenicImg" class="absolute inset-0 bg-[#021815]/90 flex flex-col items-center justify-center gap-3 z-20 backdrop-blur-sm">
+                             <Loader2 class="w-8 h-8 text-emerald-400 animate-spin" />
+                             <span class="text-xs tracking-widest text-emerald-400 animate-pulse">UPLOADING...</span>
+                           </div>
+                           
+                           <input type="file" ref="scenicFileInput" class="hidden" accept="image/*" @change="e => handleImageUpload(e, 'scenic')" />
+                         </div>
+                      </div>
+                      <div class="flex flex-col gap-2 md:col-span-2">
+                         <label class="text-sm text-emerald-100/70">景区详细介绍</label>
+                         <textarea v-model="scenicForm.introduction" rows="8" class="bg-emerald-900/20 border border-emerald-500/30 rounded px-4 py-2 text-emerald-100 focus:outline-none focus:border-emerald-400 focus:bg-emerald-900/40 transition-colors resize-none custom-scrollbar"></textarea>
+                      </div>
+                   </div>
                 </div>
              </div>
           </div>
 
           <!-- ================== 景点列表管理 ================== -->
-          <div v-if="activeMenu === 'spots'" class="animate-fade-in flex flex-col h-full">
-             <div class="flex justify-between items-center mb-6">
-                <h3 class="text-lg font-bold text-emerald-300 border-l-4 border-emerald-400 pl-3">景点与客流管理</h3>
-                <button @click="openSpotModal()" class="px-4 py-2 bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 font-bold rounded hover:bg-emerald-500/40 transition-all flex items-center gap-2">
-                   <Plus class="w-4 h-4" /> 新增景点
+          <div v-if="activeMenu === 'spots'" class="flex-1 flex flex-col overflow-hidden animate-fade-in">
+
+             <div class="flex-shrink-0 flex justify-between items-center p-6 border-b border-emerald-500/10">
+                <h3 class="text-lg font-bold text-emerald-300 border-l-4 border-emerald-400 pl-3 tracking-wider">景点列表管理</h3>
+                <button @click="openSpotModal()" class="px-4 py-2 bg-emerald-500/20 hover:bg-emerald-500/40 border border-emerald-400/50 rounded text-emerald-300 transition-all flex items-center gap-2 hover:shadow-[0_0_15px_rgba(52,211,153,0.4)]">
+                   <Plus class="w-4 h-4" /> 添加新景点
                 </button>
              </div>
 
-             <div v-if="loadingSpots" class="text-emerald-400/60 flex items-center gap-2">
-                <Loader2 class="w-5 h-5 animate-spin" /> 数据加载中...
-             </div>
+             <!-- 可滚动的列表主体 -->
+             <div class="flex-1 overflow-y-auto p-6 custom-scrollbar">
+                <div class="max-w-4xl mx-auto pb-12">
+                   <div v-if="loadingSpots" class="text-emerald-400/60 flex items-center gap-2">
+                      <Loader2 class="w-5 h-5 animate-spin" /> 数据加载中...
+                   </div>
 
-             <div v-else class="flex-1 overflow-auto custom-scrollbar pr-2">
-                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                   <!-- 景点卡片 -->
-                   <div v-for="spot in spotList" :key="spot.id" class="border border-emerald-500/30 bg-emerald-900/20 rounded-lg p-4 relative group hover:border-emerald-400/60 transition-colors">
-                      <div class="flex gap-4">
-                         <img :src="spot.image_url" class="w-20 h-20 rounded object-cover border border-emerald-500/30 shrink-0" alt="spot image" />
-                         <div class="flex flex-col flex-1 overflow-hidden">
-                            <div class="flex justify-between items-start">
-                               <h4 class="text-emerald-100 font-bold truncate">{{ spot.spot_name }}</h4>
-                               <span :class="['text-[10px] px-1.5 py-0.5 rounded border whitespace-nowrap', getStatusColor(spot.status)]">{{ spot.status || '未知' }}</span>
-                            </div>
-                            <span class="text-xs text-emerald-500/60 font-mono truncate">{{ spot.en_name }}</span>
-                            <div class="mt-auto flex justify-between items-center">
-                               <span class="text-xs text-emerald-100/50">承载: {{ spot.max_capacity }} 人</span>
-                               <div class="flex gap-2">
-                                  <button @click="openSpotModal(spot)" class="text-emerald-400 hover:text-emerald-300 bg-emerald-900/50 p-1.5 rounded transition-colors"><Edit2 class="w-3.5 h-3.5" /></button>
-                                  <button @click="handleDeleteSpot(spot.id)" class="text-red-400 hover:text-red-300 bg-red-900/30 p-1.5 rounded transition-colors"><Trash2 class="w-3.5 h-3.5" /></button>
-                               </div>
-                            </div>
-                         </div>
-                      </div>
+                   <div v-else class="grid grid-cols-1 gap-4">
+                       <div v-for="spot in spotList" :key="spot.id" class="group bg-emerald-900/10 border border-emerald-500/20 rounded-lg p-4 hover:border-emerald-500/50 hover:bg-emerald-900/20 transition-all flex gap-4">
+                          <!-- 左侧缩略图 -->
+                          <div class="w-24 h-24 rounded bg-[#020b14] border border-emerald-500/30 overflow-hidden flex-shrink-0 relative group-hover:border-emerald-400">
+                             <img v-if="spot.image_url" :src="spot.image_url" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+                             <div v-else class="w-full h-full flex items-center justify-center text-emerald-500/30">
+                                <ImageIcon class="w-8 h-8" />
+                             </div>
+                          </div>
+
+                          <!-- 中间信息 -->
+                          <div class="flex-1 flex flex-col justify-center">
+                             <div class="flex items-center gap-2 mb-1">
+                                <h4 class="text-lg font-bold text-emerald-100">{{ spot.spot_name }}</h4>
+                                <span class="text-xs px-2 py-0.5 bg-emerald-500/20 text-emerald-400 rounded">{{ spot.en_name || 'N/A' }}</span>
+                             </div>
+                             <p class="text-sm text-emerald-100/60 line-clamp-2 mb-2">{{ spot.description || '暂无简介' }}</p>
+                             <div class="flex items-center gap-4 text-xs text-emerald-400/80">
+                                <span class="flex items-center gap-1"><Users class="w-3.5 h-3.5" /> 最大承载: <b class="text-emerald-300">{{ spot.max_capacity }}</b></span>
+                                <span>排序权重: {{ spot.sort_order }}</span>
+                             </div>
+                          </div>
+
+                          <!-- 右侧操作 -->
+                          <div class="flex flex-col gap-2 justify-center border-l border-emerald-500/10 pl-4">
+                             <button @click="openSpotModal(spot)" class="p-2 text-emerald-400 hover:bg-emerald-500/20 rounded transition-colors" title="编辑">
+                                <Edit class="w-4 h-4" />
+                             </button>
+                             <button @click="handleDeleteSpot(spot.id)" class="p-2 text-red-400 hover:bg-red-500/20 rounded transition-colors" title="删除">
+                                <Trash2 class="w-4 h-4" />
+                             </button>
+                          </div>
+                       </div>
                    </div>
                 </div>
              </div>
@@ -156,10 +183,11 @@
         </main>
       </div>
     </div>
+  </div>
 
-    <!-- 新增/编辑景点的内部子弹窗 -->
+  <!-- 新增/编辑景点的内部子弹窗 -->
     <div v-if="spotModalVisible" class="absolute inset-0 z-[110] flex items-center justify-center bg-black/60 backdrop-blur-sm">
-       <div class="w-[90%] max-w-[500px] bg-[#021815] border border-emerald-400/50 rounded-lg shadow-2xl p-6 relative">
+    <div class="w-[90%] max-w-[500px] bg-[#021815] border border-emerald-400/50 rounded-lg shadow-2xl p-6 relative">
           <button @click="spotModalVisible = false" class="absolute top-4 right-4 text-emerald-400/60 hover:text-emerald-300"><X class="w-5 h-5" /></button>
           <h3 class="text-lg font-bold text-emerald-300 mb-6">{{ isEditingSpot ? '编辑景点' : '新增景点' }}</h3>
           
@@ -224,12 +252,11 @@
           </div>
        </div>
     </div>
-  </div>
 </template>
 
 <script setup>
 import { ref, watch } from 'vue'
-import { X, Database, Map, MapPin, Save, Plus, Edit2, Trash2, Loader2, Upload } from 'lucide-vue-next'
+import { X, Database, Map, MapPin, Save, Plus, Edit2, Trash2, Loader2, Upload, Image as ImageIcon, Users, Edit } from 'lucide-vue-next'
 import { getScenicInfo, updateScenicInfo, getScenicSpots, addScenicSpot, updateScenicSpot, deleteScenicSpot, uploadImage } from '../../api/scenic'
 import { Message } from '../../utils/message'
 
@@ -255,6 +282,7 @@ const scenicForm = ref({
   id: null,
   scenic_name: '',
   scenic_en_name: '',
+  address: '',
   cover_image: '',
   ticket_price: '',
   opening_hours: '',

@@ -181,7 +181,7 @@ onUnmounted(() => {
 
 // 默认中心点：浙大科技园湖州基地
 const center = ref([120.088993, 30.865912])
-const zoom = ref(15)
+const zoom = ref(12)
 let mapInstance = null
 let walkingRoute = null
 let locationMarker = null
@@ -249,8 +249,8 @@ const drawRoute = () => {
     })
     mapInstance.add(locationMarker)
     
-    // 定位到中心并稍微放大
-    mapInstance.setZoomAndCenter(16, [lng1, lat1])
+    // 定位到中心并放大地图层级（拉近视角）
+    mapInstance.setZoomAndCenter(12, [lng1, lat1])
   }
 }
 

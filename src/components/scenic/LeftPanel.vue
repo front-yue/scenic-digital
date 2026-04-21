@@ -29,7 +29,13 @@
         </div>
         <div class="mt-auto pt-6">
           <h3 class="text-2xl font-black text-emerald-300 tracking-widest filter drop-shadow-[0_0_5px_#34d399]">{{ store.scenicInfo.scenic_name }}</h3>
-          <p class="text-[10px] text-emerald-400/80 font-mono tracking-widest mt-1">{{ store.scenicInfo.scenic_en_name}}</p>
+          <div class="flex items-center justify-between gap-2 mt-1">
+             <p class="text-[10px] text-emerald-400/80 font-mono tracking-widest">{{ store.scenicInfo.scenic_en_name}}</p>
+             <div v-if="store.scenicInfo.address" class="flex items-center justify-end gap-1 text-emerald-100/60 text-[11px] group cursor-default max-w-[60%]">
+                <MapPin class="w-3 h-3 shrink-0 group-hover:text-emerald-300 transition-colors" />
+                <span class="truncate group-hover:text-emerald-300 transition-colors" :title="store.scenicInfo.address">{{ store.scenicInfo.address }}</span>
+             </div>
+          </div>
         </div>
       </div>
     </div>
@@ -38,8 +44,9 @@
     <div class="tech-card flex-1 min-h-[150px] max-h-[250px] p-6 relative flex flex-col gap-3 border-emerald-500/20 bg-[#021815]/60 shrink-0">
       <div class="flex items-center gap-2 mb-2 shrink-0">
         <div class="w-2 h-4 bg-emerald-400"></div>
-        <h3 class="text-lg font-bold text-white tracking-wider">景区简介</h3>
+        <h3 class="text-lg font-bold text-white tracking-wider shrink-0">景区简介</h3>
       </div>
+      
       <div 
         ref="introScrollContainer"
         class="overflow-y-auto custom-scrollbar flex-1 pr-2 relative z-10"
@@ -117,7 +124,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import { Sun, Ticket, Clock as ClockIcon } from 'lucide-vue-next'
+import { Sun, Ticket, Clock as ClockIcon, MapPin } from 'lucide-vue-next'
 import { useScenicStore } from '../../stores/scenic'
 
 const store = useScenicStore()
