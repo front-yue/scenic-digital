@@ -16,12 +16,6 @@
 
     <!-- 左侧悬浮挂件 -->
     <div class="absolute z-40 left-4 top-1/2 -translate-y-1/2 flex flex-col gap-4">
-       <!-- 版本信息按钮 -->
-       <div id="btn-version" class="relative group cursor-pointer" @click="isVersionVisible = true" title="版本信息">
-          <div class="tech-hex-btn transition-colors border-cyan-400/50 bg-cyan-400/10 hover:shadow-[0_0_15px_#00f0ff]">
-            <FileTextIcon class="w-5 h-5 text-cyan-300 group-hover:scale-110 transition-transform" />
-          </div>
-       </div>
        <!-- 麦克风状态 -->
        <div id="guide-mic-btn" class="relative group cursor-pointer" @click="handleToggleMic" title="麦克风开关">
          <div class="tech-hex-btn transition-colors" :class="audioConfig.mic ? 'border-emerald-400/50 bg-emerald-400/10' : 'border-red-400/50 bg-red-400/10'">
@@ -52,18 +46,11 @@
             <MonitorPlayIcon class="w-5 h-5 transition-transform group-hover:scale-110" :class="avatarStore.isXmovRunning ? 'text-amber-300' : 'text-cyan-400'" />
           </div>
        </div>
-       
-       <!-- 管理控制台按钮 -->
-       <div id="guide-admin-btn" class="relative group cursor-pointer" @click="openAdmin" title="数据管理控制台">
-          <div class="tech-hex-btn transition-colors border-fuchsia-400/50 bg-fuchsia-400/10 hover:shadow-[0_0_15px_#e879f9]">
-            <DatabaseIcon class="w-5 h-5 text-fuchsia-300 group-hover:scale-110 transition-transform" />
-          </div>
-       </div>
     </div>
 
     <!-- 数字人模型占位区 -->
-    <div class="relative z-20 h-[65%] w-full flex flex-col items-center justify-end pb-[100px]">
-       <div id="sdk" class="w-[550px] h-[800px] scale-110 origin-bottom flex flex-col items-center justify-center mix-blend-screen relative animate-float z-30 pointer-events-auto">
+    <div class="relative z-20 h-[80%] w-full flex flex-col items-center justify-end">
+       <div id="sdk" class="w-[342px] h-[100%] scale-110 origin-bottom flex flex-col items-center justify-center mix-blend-screen relative animate-float z-30 pointer-events-auto">
           <!-- 当 SDK 未就绪时显示占位符 -->
           <template v-if="!avatarStore.isReady">
             <UserIcon class="w-32 h-32 mb-4 opacity-70 filter drop-shadow-[0_0_15px_#00f0ff] text-cyan-300/50" />
@@ -71,9 +58,6 @@
               {{ avatarStore.isXmovRunning ? '3D AVATAR LOADING...' : '数字向导尚未唤醒' }}
             </span>
           </template>
-          
-          <!-- 扫描线动画 -->
-          <div class="absolute top-0 left-0 w-full h-[2px] bg-cyan-400/80 shadow-[0_0_10px_#00f0ff] animate-scanline pointer-events-none"></div>
        </div>
     </div>
 
@@ -100,25 +84,12 @@
       :originCoord="mapOriginCoord"
       :destCoord="mapDestCoord"
     />
-    
-    <!-- 引入版本信息弹窗 -->
-    <VersionModal 
-      :visible="isVersionVisible" 
-      @update:visible="isVersionVisible = $event"
-    />
-
-    <!-- 引入后台管理控制台 -->
-    <AdminOverlay 
-      :visible="isAdminVisible" 
-      @update:visible="isAdminVisible = $event"
-    />
-
   </section>
 </template>
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
-import {   User as UserIcon,  MapPin as MapPinIcon,  Mic as MicIcon,  MicOff as MicOffIcon,  FileText as FileTextIcon,  Power as PowerIcon,  PowerOff as PowerOffIcon,  MonitorPlay as MonitorPlayIcon, Database as DatabaseIcon} from 'lucide-vue-next'
+import {   User as UserIcon,  MapPin as MapPinIcon,  Mic as MicIcon,  MicOff as MicOffIcon,  Power as PowerIcon,  PowerOff as PowerOffIcon,  MonitorPlay as MonitorPlayIcon} from 'lucide-vue-next'
 import { useAvatarStore } from '@/stores/avatar'
 import { useScenicStore } from '@/stores/scenic'
 import { getAudioConfig, toggleMicrophone, startFayLive, stopFayLive, getFayStatus } from '@/api/fay'
@@ -126,8 +97,6 @@ import { getGeocode } from '@/api/map'
 import { Message } from '@/utils/message'
 import { useWebSocket } from '@vueuse/core'
 import MapModal from './MapModal.vue'
-import VersionModal from '../common/VersionModal.vue'
-import AdminOverlay from '../admin/AdminOverlay.vue'
 import { driver } from 'driver.js'
 import 'driver.js/dist/driver.css'
 
@@ -141,13 +110,6 @@ const message = ref('')
 const isMapVisible = ref(false)
 const mapOriginCoord = ref('')
 const mapDestCoord = ref('')
-
-const isVersionVisible = ref(false)
-const isAdminVisible = ref(false)
-
-const openAdmin = () => {
-  isAdminVisible.value = true
-}
 
 // 接入 Fay WebSocket 监听
 const { status: wsStatus, data: wsData, send: wsSend } = useWebSocket('ws://127.0.0.1:10002', {
@@ -369,15 +331,6 @@ const initGuide = () => {
             side: 'left',
             align: 'start'
           }
-        },
-        {
-          element: '#guide-map-route-btn',
-          popover: {
-            title: '导航模拟',
-            description: '测试按钮：模拟数字人发起路线规划时弹出的导航地图雷达。',
-            side: 'left',
-            align: 'start'
-          }
         }
       ],
       onDestroyed: () => {
@@ -399,3 +352,10 @@ onMounted(() => {
   initGuide()
 })
 </script>
+<style lang="scss" scoped>
+#sdk{
+  canvas{
+    inset: auto;
+  }
+}
+</style>

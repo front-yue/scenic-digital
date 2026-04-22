@@ -1,4 +1,4 @@
-<template>
+ <template>
   <div class="h-screen w-full bg-[#021114] text-[#a7f3d0] font-sans relative overflow-hidden tech-bg flex flex-col">
     
     <!-- 全局 Canvas 粒子背景 -->
@@ -44,10 +44,12 @@
             <div class="flex-1 h-[1px] bg-cyan-500/50 relative">
                <div class="absolute right-0 top-1/2 -translate-y-1/2 w-16 h-[3px] bg-cyan-400"></div>
             </div>
-            <div class="flex gap-1">
-              <div class="w-1.5 h-1.5 bg-blue-500 rotate-45"></div>
-              <div class="w-1.5 h-1.5 bg-cyan-400 rotate-45"></div>
-              <div class="w-1.5 h-1.5 bg-blue-500 rotate-45"></div>
+            <div class="cursor-pointer group" @click="versionVisible = true">
+              <div class="flex items-center gap-1.5 px-3 py-1 rounded-full border border-cyan-500/30 bg-cyan-900/20 backdrop-blur-md group-hover:bg-cyan-500/20 transition-all shadow-[0_0_10px_rgba(0,240,255,0.08)] group-hover:shadow-[0_0_15px_rgba(0,240,255,0.25)]">
+                <div class="w-1.5 h-1.5 bg-cyan-400 rotate-45 shadow-[0_0_8px_#00f0ff]"></div>
+                <span class="text-xs text-cyan-400/80 tracking-[0.2em] font-mono group-hover:text-cyan-300">SYS KERNEL V3.0</span>
+                <div class="w-1.5 h-1.5 bg-cyan-400 rotate-45 shadow-[0_0_8px_#00f0ff]"></div>
+              </div>
             </div>
             <div class="flex-1 h-[1px] bg-cyan-500/50 relative">
                <div class="absolute left-0 top-1/2 -translate-y-1/2 w-16 h-[3px] bg-cyan-400"></div>
@@ -55,19 +57,14 @@
           </div>
         </div>
 
-        <div class="relative w-[30%] h-full">
+        <div class="relative w-[30%] h-[60px]">
            <div class="absolute top-0 right-0 w-full h-[60px] bg-gradient-to-l from-[#00f0ff]/10 to-transparent skew-x-[30deg] origin-top border-b border-cyan-500/30"></div>
            <div class="absolute top-0 right-0 w-full h-full flex flex-col items-end justify-center px-8">
-              <div class="flex items-center gap-4 cursor-pointer group" @click="adminVisible = true">
+              <div class="cursor-pointer group" @click="adminVisible = true">
                 <div class="flex items-center gap-2 px-4 py-1.5 rounded-full border border-cyan-500/30 bg-cyan-900/20 backdrop-blur-md group-hover:bg-cyan-500/20 transition-all shadow-[0_0_15px_rgba(0,240,255,0.1)] group-hover:shadow-[0_0_20px_rgba(0,240,255,0.3)]">
                   <DatabaseIcon class="w-4 h-4 text-cyan-300 group-hover:text-white" />
                   <span class="text-sm font-bold text-cyan-300 tracking-widest group-hover:text-white">控制台</span>
                 </div>
-              </div>
-              <div class="flex items-center gap-2 mt-2 mr-2">
-                <div class="w-1.5 h-1.5 bg-cyan-400 rotate-45 shadow-[0_0_8px_#00f0ff]"></div>
-                <span class="text-xs text-cyan-500/60 tracking-[0.2em] font-mono">SYS KERNEL V3.0</span>
-                <div class="w-1.5 h-1.5 bg-cyan-400 rotate-45 shadow-[0_0_8px_#00f0ff]"></div>
               </div>
            </div>
         </div>
@@ -97,6 +94,9 @@
 
     <!-- 管理后台弹窗组件 -->
     <AdminOverlay v-model:visible="adminVisible" @data-updated="store.refreshAllData" />
+
+    <!-- 版本信息弹窗 -->
+    <VersionModal  :visible="versionVisible"  @update:visible="versionVisible = $event"/>
   </div>
 </template>
 
@@ -104,12 +104,13 @@
 import { onMounted, onUnmounted, ref } from 'vue'
 import { Clock as ClockIcon, Database as DatabaseIcon } from 'lucide-vue-next'
 
-import LeftPanel from '../components/scenic/LeftPanel.vue'
-import CenterPanel from '../components/scenic/CenterPanel.vue'
-import RightPanel from '../components/scenic/RightPanel.vue'
-import AdminOverlay from '../components/admin/AdminOverlay.vue'
+import LeftPanel from '@/components/scenic/LeftPanel.vue'
+import CenterPanel from '@/components/scenic/CenterPanel.vue'
+import RightPanel from '@/components/scenic/RightPanel.vue'
+import AdminOverlay from '@/components/admin/AdminOverlay.vue'
+import VersionModal from '@/components/common/VersionModal.vue'
 
-import { useScenicStore } from '../stores/scenic'
+import { useScenicStore } from '@/stores/scenic'
 
 const store = useScenicStore()
 
@@ -126,6 +127,7 @@ const updateTime = () => {
 
 // 弹窗状态
 const adminVisible = ref(false);
+const versionVisible = ref(false);
 
 // =========== Canvas 背景粒子特效 ===========
 const particleCanvas = ref(null)
