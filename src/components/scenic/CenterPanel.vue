@@ -152,10 +152,10 @@ watch(wsData, (newData) => {
       if(msg.Data.IsEnd == 1) {
         avatarStore.speak(message.value, true, true)
          // 匹配 "从【起点】到【终点】"
-        message.value = ''
-        const routeMatch = message.value.match(/从【(.*?)】到【(.*?)】/)
-        if (routeMatch) {
-          triggerMapNav(routeMatch[1], routeMatch[2])
+         const routeMatch = message.value.match(/从【(.*?)】到【(.*?)】/)
+         message.value = ''
+         if (routeMatch) {
+           triggerMapNav(routeMatch[1], routeMatch[2])
         }
       }
     }
@@ -170,7 +170,6 @@ const triggerMapNav = async (origin, dest) => {
   if(dest == "当前位置") {
     dest = scenicStore.scenicInfo?.address
   }
-  alert(origin + dest)
   const [originRes, destRes] = await Promise.all([
     getGeocode(origin),
     getGeocode(dest)

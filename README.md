@@ -52,6 +52,10 @@
 - 🏗 **标准化的全栈工程架构**
   - **前端**：Vue 3 组合式 API, Pinia 全局状态, Axios 拦截器封装, `@` 路径别名配置, 环境变量隔离。
   - **后端**：Python Flask 蓝图路由分发, Service 业务逻辑层抽离, `.env` 敏感配置隔离。
+- 🗺️ **MCP 地图导航服务**
+  - 基于 Model Context Protocol (MCP) 协议构建独立的地图导航服务。
+  - 集成高德地图 API，支持景区内任意两点之间的步行路线规划。
+  - 数字人可直接调用导航工具，为游客提供语音导航指引。
 
 ---
 
@@ -72,6 +76,11 @@
 - **跨域处理**: Flask-CORS
 - **文件处理**: Werkzeug (本地安全文件上传)
 - **数据库驱动**: PyMySQL
+
+### MCP 服务 (MCP Server)
+- **核心框架**: FastMCP (Model Context Protocol)
+- **地图服务**: 高德地图 Web API
+- **功能**: 景区内步行导航路线规划
 
 ### 数据库 (Database)
 - **MySQL 8.0+** (提供完整的建表与测试数据 SQL 脚本)
@@ -109,6 +118,15 @@
    ```
 2. 填入您的魔珐星云数字人 `VITE_XMOV_APP_ID` 和 `VITE_XMOV_APP_SECRET`。
    > **注**：Xmov SDK 凭证的获取请进入官网 `https://c.c1nd.cn/9C9WW` 邀请码：`JHTA3EQSZP`，注册后可免费试用。
+
+**MCP 服务配置 (`mcp_server/.env`)**：
+1. 进入 `mcp_server` 目录，复制模板文件：
+   ```bash
+   cp .env.example .env
+   ```
+2. 填入高德地图 Web 服务 API Key：
+   - `AMAP_KEY`: 您的高德地图 Web 服务 API Key
+   > **获取方式**：访问 [高德开放平台](https://lbs.amap.com/) 注册账号，创建应用后获取 Web 服务 API Key。
 
 ### 4. 启动项目
 
@@ -179,6 +197,10 @@ npm run dev
 │   ├── uploads/               # 本地图片上传存储目录
 │   ├── .env.example           # 后端数据库环境变量模板
 │   └── run.py                 # 后端启动入口
+├── mcp_server/                # MCP 地图导航服务目录
+│   ├── main.py                # MCP 服务入口 (高德地图导航)
+│   ├── requirements.txt       # MCP 服务依赖
+│   └── .env.example           # 高德地图 API Key 配置模板
 ├── database/                  # 数据库目录
 │   └── scenic_init.sql        # MySQL 初始化脚本 (包含建表与 Mock 数据)
 ├── scripts/                   # 项目自动化脚本
@@ -195,6 +217,27 @@ npm run dev
 ├── jsconfig.json              # IDE 路径智能提示配置 (@ 指向 src)
 └── vite.config.js             # Vite 构建配置
 ```
+
+---
+
+## 🗺️ MCP 地图导航服务
+
+本项目集成了基于 **Model Context Protocol (MCP)** 协议的地图导航服务，为数字人提供智能导航能力。
+
+### 功能特性
+- **步行路线规划**：支持景区内任意两点之间的步行导航
+- **智能位置识别**：支持"当前位置"等语义化关键词
+- **自然语言输出**：返回人类可读的导航指令和预计时间
+
+### 配置说明
+1. 获取高德地图 Web 服务 API Key：访问 [高德开放平台](https://lbs.amap.com/)
+2. 在 `mcp_server/.env` 中配置 `AMAP_KEY`
+3. Fay 数字人会自动通过 MCP 协议调用导航工具
+
+### 使用示例
+游客可以询问数字人：
+- "从这里到千年古刹怎么走？"
+- "当前位置到云海观景台有多远？"
 
 ---
 
