@@ -18,8 +18,8 @@ export const useAvatarStore = defineStore('avatar', () => {
 
     try {
       const url = new URL('https://nebula-agent.xingyun3d.com/user/v1/ttsa/session')
-      url.searchParams.append('data_source', '2')
-      url.searchParams.append('custom_id', 'demo')
+      url.searchParams.append('data_source', '0')
+      url.searchParams.append('custom_id', 'scenic')
 
       const avatar = new window.XmovAvatar({
         containerId: '#sdk',
