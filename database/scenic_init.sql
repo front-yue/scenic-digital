@@ -9,6 +9,21 @@ USE `scenic`;
 
 
 -- --------------------------------------------------
+-- 1. 系统配置表 (system_config)
+-- 用途: 存储系统级的全局配置（如：主题设置等）
+-- --------------------------------------------------
+CREATE TABLE IF NOT EXISTS `system_config` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `config_key` VARCHAR(50) NOT NULL UNIQUE COMMENT '配置键名',
+  `config_value` TEXT COMMENT '配置值',
+  `description` VARCHAR(255) COMMENT '配置说明',
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='系统配置表';
+
+INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`) VALUES 
+('theme', 'default', '全局主题设置');
+
+-- --------------------------------------------------
 -- 2. 景区概况信息表 (scenic_info)
 -- 用途: 存储左侧面板的“景区全景概况”各个卡片模块的数据。
 -- --------------------------------------------------

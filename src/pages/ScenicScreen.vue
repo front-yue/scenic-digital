@@ -1,13 +1,13 @@
  <template>
-  <div class="h-screen w-full bg-[#021114] text-[#a7f3d0] font-sans relative overflow-hidden tech-bg flex flex-col">
+  <div class="h-screen w-full font-sans relative overflow-hidden tech-bg flex flex-col" style="background-color: var(--app-bg); color: var(--app-text);">
     
     <!-- 全局 Canvas 粒子背景 -->
     <canvas ref="particleCanvas" class="absolute inset-0 z-0 opacity-60"></canvas>
 
     <!-- 全局背景光晕与网格特效 -->
     <div class="absolute inset-0 pointer-events-none z-0">
-      <div class="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[80%] h-[600px] bg-[#0d9488]/20 blur-[150px] rounded-[100%]"></div>
-      <div class="absolute bottom-[-10%] left-1/2 -translate-x-1/2 w-[100%] h-[400px] bg-[#10b981]/15 blur-[150px] rounded-[100%]"></div>
+      <div class="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[80%] h-[600px] blur-[150px] rounded-[100%]" style="background-color: var(--app-glow-1);"></div>
+      <div class="absolute bottom-[-10%] left-1/2 -translate-x-1/2 w-[100%] h-[400px] blur-[150px] rounded-[100%]" style="background-color: var(--app-glow-2);"></div>
     </div>
 
     <!-- ================= 顶部标题栏 ================= -->
@@ -86,14 +86,25 @@
     <!-- ================= 主体内容区 ================= -->
     <main class="flex-1 w-full max-w-[1800px] mx-auto p-4 lg:p-6 flex flex-col lg:flex-row items-stretch gap-10 relative z-10 perspective-[1500px] min-h-0 pb-8 pt-4">
       
-      <LeftPanel />
+      <!-- 左侧面板：带平滑退场动画 -->
+      <transition name="panel-left">
+        <LeftPanel v-show="!store.isInteractMode" class="transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]" />
+      </transition>
+      
       <CenterPanel />
-      <RightPanel />
+
+      <!-- 右侧面板：带平滑退场动画 -->
+      <transition name="panel-right">
+        <RightPanel v-show="!store.isInteractMode" class="transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]" />
+      </transition>
 
     </main>
 
     <!-- 管理后台弹窗组件 -->
-    <AdminOverlay v-model:visible="adminVisible" @data-updated="store.refreshAllData" />
+    <AdminOverlay v-model:visible="adminVisible" @data-updated="store.refreshAllData" @theme-changed="initParticleCanvas" />
+
+    <!-- AI 照相馆弹窗组件 -->
+    <AIPhotoOverlay />
 
     <!-- 版本信息弹窗 -->
     <VersionModal  :visible="versionVisible"  @update:visible="versionVisible = $event"/>
@@ -108,9 +119,11 @@ import LeftPanel from '@/components/scenic/LeftPanel.vue'
 import CenterPanel from '@/components/scenic/CenterPanel.vue'
 import RightPanel from '@/components/scenic/RightPanel.vue'
 import AdminOverlay from '@/components/admin/AdminOverlay.vue'
+import AIPhotoOverlay from '@/components/photo/AIPhotoOverlay.vue'
 import VersionModal from '@/components/common/VersionModal.vue'
 
 import { useScenicStore } from '@/stores/scenic'
+import { getConfig } from '@/api/config'
 
 const store = useScenicStore()
 
@@ -135,6 +148,9 @@ let animationFrameId = null
 let handleResize = null 
 
 const initParticleCanvas = () => {
+  if (handleResize) window.removeEventListener('resize', handleResize)
+  if (animationFrameId) cancelAnimationFrame(animationFrameId)
+
   const canvas = particleCanvas.value
   if (!canvas) return
   
@@ -155,7 +171,18 @@ const initParticleCanvas = () => {
       this.size = Math.random() * 2 + 0.5
       this.speedX = Math.random() * 1 - 0.5
       this.speedY = Math.random() * 1 - 0.5
-      this.color = Math.random() > 0.5 ? '#10b981' : '#34d399'
+      const theme = document.documentElement.getAttribute('data-theme')
+      if (theme === 'spring_season') {
+        this.color = Math.random() > 0.5 ? '#84cc16' : '#22c55e'
+      } else if (theme === 'summer') {
+        this.color = Math.random() > 0.5 ? '#38bdf8' : '#3b82f6'
+      } else if (theme === 'autumn') {
+        this.color = Math.random() > 0.5 ? '#f97316' : '#f59e0b'
+      } else if (theme === 'winter') {
+        this.color = Math.random() > 0.5 ? '#94a3b8' : '#818cf8'
+      } else {
+        this.color = Math.random() > 0.5 ? '#10b981' : '#34d399'
+      }
       this.opacity = Math.random() * 0.5 + 0.2
     }
     update() {
@@ -184,6 +211,13 @@ const initParticleCanvas = () => {
   }
   
   const connect = () => {
+    const theme = document.documentElement.getAttribute('data-theme')
+    let strokeColor = '#10b981'
+    if (theme === 'spring_season') strokeColor = '#84cc16'
+    else if (theme === 'summer') strokeColor = '#38bdf8'
+    else if (theme === 'autumn') strokeColor = '#f97316'
+    else if (theme === 'winter') strokeColor = '#94a3b8'
+
     for (let a = 0; a < particlesArray.length; a++) {
       for (let b = a; b < particlesArray.length; b++) {
         const dx = particlesArray[a].x - particlesArray[b].x
@@ -192,7 +226,7 @@ const initParticleCanvas = () => {
         
         if (distance < 12000) {
           ctx.globalAlpha = 1 - distance / 12000
-          ctx.strokeStyle = '#10b981'
+          ctx.strokeStyle = strokeColor
           ctx.lineWidth = 0.5
           ctx.beginPath()
           ctx.moveTo(particlesArray[a].x, particlesArray[a].y)
@@ -223,7 +257,25 @@ const startClock = () => {
   timeInterval = setInterval(updateTime, 1000);
 }
 
+const loadSystemConfig = async () => {
+  try {
+    const res = await getConfig('theme')
+    if (res && res.status === 'success' && res.data && res.data.value) {
+      const theme = res.data.value
+      if (theme === 'default') {
+        document.documentElement.removeAttribute('data-theme')
+      } else {
+        document.documentElement.setAttribute('data-theme', theme)
+      }
+      initParticleCanvas()
+    }
+  } catch (error) {
+    console.error('获取系统配置失败:', error)
+  }
+}
+
 onMounted(() => {
+  loadSystemConfig();
   store.refreshAllData();
   initParticleCanvas();
   startClock();
@@ -246,7 +298,7 @@ onUnmounted(() => {
 }
 
 .text-shadow-glow {
-  text-shadow: 0 0 10px rgba(0, 240, 255, 0.8), 0 0 20px rgba(0, 100, 255, 0.5);
+  text-shadow: 0 0 10px var(--app-shadow), 0 0 20px rgba(0, 100, 255, 0.5);
 }
 
 /* 3D */
@@ -318,6 +370,27 @@ onUnmounted(() => {
   50% { transform: scale(1.1); opacity: 1; }
 }
 .animate-pulse-core { animation: pulseCore 2s ease-in-out infinite; }
+
+/* 面板滑出动画 */
+.panel-left-enter-active,
+.panel-left-leave-active {
+  transition: all 0.7s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.panel-left-enter-from,
+.panel-left-leave-to {
+  opacity: 0;
+  transform: translateX(-100%) scale(0.9);
+}
+
+.panel-right-enter-active,
+.panel-right-leave-active {
+  transition: all 0.7s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.panel-right-enter-from,
+.panel-right-leave-to {
+  opacity: 0;
+  transform: translateX(100%) scale(0.9);
+}
 
 .custom-scrollbar::-webkit-scrollbar { width: 4px; }
 .custom-scrollbar::-webkit-scrollbar-track { background: rgba(16, 185, 129, 0.05); border-radius: 4px; }

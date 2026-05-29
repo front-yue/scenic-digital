@@ -32,9 +32,11 @@ def create_app(config_class=Config):
     from app.routes.spot_routes import spot_bp
     from app.routes.upload_routes import upload_bp
     from app.routes.map_routes import map_bp
+    from app.routes.config_routes import config_bp
 
     app.register_blueprint(scenic_info_bp, url_prefix='/api/scenic')
     app.register_blueprint(spot_bp, url_prefix='/api/scenic')
+    app.register_blueprint(config_bp, url_prefix='/api/config')
     
     app.register_blueprint(upload_bp, url_prefix='/api')
     

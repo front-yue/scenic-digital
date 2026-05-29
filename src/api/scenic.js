@@ -74,6 +74,19 @@ export const deleteScenicSpot = (id) => {
   });
 };
 
+/**
+ * 更新景点当前客流 (用于演示控制)
+ * @param {Number} id 景点ID
+ * @param {Number} current_visitors 当前人数
+ */
+export const updateSpotFlow = (id, current_visitors) => {
+  return scenicRequest({
+    url: `/api/scenic/spots/${id}/flow`,
+    method: 'put',
+    data: { current_visitors }
+  });
+};
+
 // =================== 文件上传 API ===================
 
 /**

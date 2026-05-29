@@ -30,22 +30,47 @@
       </div>
     </div>
 
-    <!-- 底部操作按钮 -> 替换为消息输入区 -->
-    <div class="mt-auto shrink-0 h-14 w-full flex relative group">
-       <input 
-          v-model="chatMessage" 
-          @keyup.enter="handleSendMessage"
-          type="text" 
-          placeholder="向 Fay 发送消息..." 
-          class="w-full h-full bg-[#021815]/80 border-2 border-emerald-500/30 rounded-lg pl-4 pr-14 text-emerald-100 tracking-wider placeholder-emerald-500/50 focus:outline-none focus:border-emerald-400 focus:shadow-[0_0_15px_rgba(52,211,153,0.3)] transition-all"
-       />
+    <!-- 底部操作按钮 -> 替换为消息输入区与互动按钮 -->
+    <div class="mt-auto shrink-0 flex flex-col gap-3">
+       <!-- 互动体验区 -->
+       <div class="flex items-center gap-2 mb-1">
+          <div class="w-1.5 h-1.5 rotate-45" style="background-color: var(--app-primary); box-shadow: 0 0 8px var(--app-primary);"></div>
+          <span class="text-xs font-bold tracking-widest" style="color: var(--app-primary);">互动体验</span>
+       </div>
        <button 
-          @click="handleSendMessage" 
-          :disabled="isSending || !chatMessage.trim()"
-          class="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center bg-emerald-500/20 hover:bg-emerald-500/40 rounded-md text-emerald-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          @click="store.isInteractMode = true"
+          class="w-full relative group/btn overflow-hidden rounded-lg border bg-black/30 p-3 transition-all duration-300 hover-border-primary"
+          style="border-color: rgba(var(--app-primary-rgb), 0.3);"
        >
-          <Send class="w-4 h-4" :class="{'animate-pulse': isSending}" />
+          <div class="absolute inset-0 bg-gradient-to-r from-transparent via-[rgba(var(--app-primary-rgb),0.1)] to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700"></div>
+          <div class="flex items-center gap-3">
+             <div class="w-10 h-10 rounded bg-black/50 border flex items-center justify-center group-hover/btn:scale-110 transition-transform" style="border-color: rgba(var(--app-primary-rgb), 0.5);">
+                <Camera class="w-5 h-5" style="color: var(--app-primary);" />
+             </div>
+             <div class="text-left">
+                <h3 class="font-bold text-sm" style="color: var(--app-text);">AI 穿越照相馆</h3>
+                <p class="text-[10px] mt-0.5 opacity-70" style="color: var(--app-primary);">一键生成景区实景融合海报</p>
+             </div>
+          </div>
        </button>
+
+       <!-- 消息输入区 -->
+       <div class="h-12 w-full flex relative group mt-1">
+         <input 
+            v-model="chatMessage" 
+            @keyup.enter="handleSendMessage"
+            type="text" 
+            placeholder="向 Fay 发送消息..." 
+            class="w-full h-full bg-[#021815]/80 border-2 border-emerald-500/30 rounded-lg pl-4 pr-12 text-sm text-emerald-100 tracking-wider placeholder-emerald-500/50 focus:outline-none focus:border-emerald-400 focus:shadow-[0_0_15px_rgba(52,211,153,0.3)] transition-all"
+         />
+         <button 
+            @click="handleSendMessage" 
+            :disabled="isSending || !chatMessage.trim()"
+            class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-emerald-500/20 hover:bg-emerald-500/40 rounded text-emerald-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+         >
+            <Send class="w-4 h-4" :class="{'animate-pulse': isSending}" />
+         </button>
+       </div>
     </div>
 
   </aside>
@@ -53,7 +78,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { Send } from 'lucide-vue-next'
+import { Send, Camera, User } from 'lucide-vue-next'
 import { useScenicStore } from '@/stores/scenic'
 import { useAvatarStore } from '@/stores/avatar'
 import { sendFayMessage } from '@/api/fay'
@@ -85,3 +110,9 @@ const handleSendMessage = async () => {
   }
 }
 </script>
+
+<style scoped>
+.hover-border-primary:hover {
+  border-color: var(--app-primary) !important;
+}
+</style>
