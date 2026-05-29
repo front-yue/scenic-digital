@@ -6,7 +6,8 @@ export const useScenicStore = defineStore('scenic', {
     scenicInfo: {},
     spotList: [],
     loadingInfo: false,
-    loadingSpots: false
+    loadingSpots: false,
+    isInteractMode: false // 控制是否进入 AI 照相馆沉浸模式
   }),
   getters: {
     totalVisitors: (state) => {
