@@ -42,3 +42,14 @@ def delete_spot(spot_id):
         return ApiResponse.success({"affected_rows": affected}, "删除成功")
     except Exception as e:
         return ApiResponse.error(str(e))
+
+@spot_bp.route('/spots/<int:spot_id>/flow', methods=['PUT'])
+def update_spot_flow(spot_id):
+    """更新景点实时客流（用于演示联动效果）"""
+    data = request.get_json()
+    current_visitors = data.get('current_visitors', 0)
+    try:
+        spot_service.update_flow(spot_id, current_visitors)
+        return ApiResponse.success({}, "客流更新成功")
+    except Exception as e:
+        return ApiResponse.error(str(e))
