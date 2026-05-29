@@ -241,6 +241,30 @@ npm run dev
 
 ---
 
+## 📦 后端打包为可执行文件
+
+可将 Python Flask 后端打包为独立 exe，无需 Python 环境即可运行。
+
+### 一键打包
+
+```cmd
+scripts\build.bat
+```
+
+打包完成后，输出文件位于 `backend\dist\scenic-backend.exe`。
+
+### 使用步骤
+
+1. 打包完成后，进入 `backend\dist\` 目录
+2. 确保 `.env` 配置文件在同目录
+3. 运行 `scenic-backend.exe`
+
+### 详细说明
+
+请查看 [快速开始文档](README/快速开始.md)
+
+---
+
 ## 🤝 参与贡献
 
 欢迎提交 Issue 和 Pull Request 来完善这个项目！
