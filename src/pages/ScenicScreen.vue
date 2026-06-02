@@ -60,7 +60,7 @@
         <div class="relative w-[30%] h-[60px]">
            <div class="absolute top-0 right-0 w-full h-[60px] bg-gradient-to-l from-[#00f0ff]/10 to-transparent skew-x-[30deg] origin-top border-b border-cyan-500/30"></div>
            <div class="absolute top-0 right-0 w-full h-full flex flex-col items-end justify-center px-8">
-              <div class="cursor-pointer group" @click="adminVisible = true">
+              <div class="cursor-pointer group" @click="router.push('/admin')">
                 <div class="flex items-center gap-2 px-4 py-1.5 rounded-full border border-cyan-500/30 bg-cyan-900/20 backdrop-blur-md group-hover:bg-cyan-500/20 transition-all shadow-[0_0_15px_rgba(0,240,255,0.1)] group-hover:shadow-[0_0_20px_rgba(0,240,255,0.3)]">
                   <DatabaseIcon class="w-4 h-4 text-cyan-300 group-hover:text-white" />
                   <span class="text-sm font-bold text-cyan-300 tracking-widest group-hover:text-white">控制台</span>
@@ -100,9 +100,6 @@
 
     </main>
 
-    <!-- 管理后台弹窗组件 -->
-    <AdminOverlay v-model:visible="adminVisible" @data-updated="store.refreshAllData" @theme-changed="initParticleCanvas" />
-
     <!-- AI 照相馆弹窗组件 -->
     <AIPhotoOverlay />
 
@@ -113,12 +110,12 @@
 
 <script setup>
 import { onMounted, onUnmounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { Clock as ClockIcon, Database as DatabaseIcon } from 'lucide-vue-next'
 
 import LeftPanel from '@/components/scenic/LeftPanel.vue'
 import CenterPanel from '@/components/scenic/CenterPanel.vue'
 import RightPanel from '@/components/scenic/RightPanel.vue'
-import AdminOverlay from '@/components/admin/AdminOverlay.vue'
 import AIPhotoOverlay from '@/components/photo/AIPhotoOverlay.vue'
 import VersionModal from '@/components/common/VersionModal.vue'
 
@@ -126,6 +123,7 @@ import { useScenicStore } from '@/stores/scenic'
 import { getConfig } from '@/api/config'
 
 const store = useScenicStore()
+const router = useRouter()
 
 // 动态时间
 const currentTime = ref('');
@@ -139,7 +137,6 @@ const updateTime = () => {
 };
 
 // 弹窗状态
-const adminVisible = ref(false);
 const versionVisible = ref(false);
 
 // =========== Canvas 背景粒子特效 ===========

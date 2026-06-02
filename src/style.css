@@ -72,6 +72,29 @@
   border-top-color: rgba(0, 240, 255, 0.5) !important;
 }
 
+/* 移动端性能优化：减弱特效 */
+@media (max-width: 1023px) {
+  .tech-bg {
+    background-image: none !important;
+  }
+  .tech-card {
+    clip-path: none !important;
+  }
+  .animate-float {
+    animation: none !important;
+  }
+  .animate-scanline {
+    animation: none !important;
+  }
+  .animate-ripple-1,
+  .animate-ripple-2 {
+    animation: none !important;
+  }
+  .animate-pulse-core {
+    animation: none !important;
+  }
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
