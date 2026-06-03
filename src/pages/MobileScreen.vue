@@ -28,11 +28,11 @@
         {{ store.scenicInfo.scenic_name || '智慧文旅' }}
       </h1>
       <div class="flex items-center gap-2 ml-auto">
-        <button @click="configVisible = true" class="p-2 rounded-lg border border-white/10 bg-white/5 backdrop-blur-md active:bg-white/10 transition-all">
-          <SettingsIcon class="w-4 h-4 text-white/60" />
+        <button @click="configVisible = true" class="p-2 rounded-lg border border-white/20 bg-white/10 backdrop-blur-md active:bg-white/20 transition-all" title="系统配置">
+          <SettingsIcon class="w-4 h-4 text-white/80" />
         </button>
-        <button @click="router.push('/admin')" class="p-2 rounded-lg border border-cyan-500/30 bg-cyan-900/20 backdrop-blur-md active:bg-cyan-500/20 transition-all">
-          <DatabaseIcon class="w-4 h-4 text-cyan-300" />
+        <button @click="router.push('/admin')" class="p-2 rounded-lg border border-cyan-500/30 bg-cyan-900/20 backdrop-blur-md active:bg-cyan-500/20 transition-all" title="管理后台">
+          <LayoutDashboardIcon class="w-4 h-4 text-cyan-300" />
         </button>
       </div>
     </header>
@@ -119,6 +119,14 @@
               </div>
               <span class="text-[10px] text-white/50">数字人</span>
             </button>
+
+            <!-- AI 照相馆 -->
+            <button @click="store.isInteractMode = true" class="flex flex-col items-center gap-1.5 active:scale-90 transition-transform">
+              <div class="w-11 h-11 rounded-full flex items-center justify-center border border-cyan-400/40 bg-cyan-400/10 backdrop-blur-md transition-all active:shadow-[0_0_12px_rgba(0,240,255,0.3)]">
+                <CameraIcon class="w-5 h-5 text-cyan-300" />
+              </div>
+              <span class="text-[10px] text-white/50">照相馆</span>
+            </button>
           </div>
 
           <!-- 消息输入框 -->
@@ -165,7 +173,7 @@ import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   Clock as ClockIcon,
-  Database as DatabaseIcon,
+  LayoutDashboard as LayoutDashboardIcon,
   User as UserIcon,
   MapPin as MapPinIcon,
   Mic as MicIcon,
@@ -175,6 +183,7 @@ import {
   MonitorPlay as MonitorPlayIcon,
   Send as SendIcon,
   Settings as SettingsIcon,
+  Camera as CameraIcon,
   Sun,
   MapPin
 } from 'lucide-vue-next'
@@ -278,7 +287,6 @@ const showCurrentLocation = async () => {
     Message.warning('景区位置未配置')
     return
   }
-  Message.info('正在定位...')
   const res = await getGeocode(currentAddress)
   if (res && res.code === 200) {
     mapOriginCoord.value = res.data.location

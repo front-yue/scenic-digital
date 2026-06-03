@@ -12,7 +12,7 @@
         <!-- 弹窗主体，改为绝对定位并支持拖拽与缩放 -->
         <div 
           ref="modalRef"
-          class="absolute pointer-events-auto bg-[#061226]/90 backdrop-blur-2xl border border-cyan-500/50 rounded-xl shadow-[0_0_30px_rgba(0,240,255,0.3)] flex flex-col"
+          class="absolute pointer-events-auto bg-[#061226]/90 backdrop-blur-2xl border border-cyan-500/50 rounded-xl shadow-[0_0_30px_rgba(0,240,255,0.3)] flex flex-col touch-none"
           :style="{
             left: `${position.x}px`,
             top: `${position.y}px`,
@@ -25,6 +25,7 @@
           <div 
             class="h-10 bg-cyan-900/40 border-b border-cyan-500/30 flex items-center justify-between px-4 z-20 relative rounded-t-xl cursor-move select-none"
             @mousedown="startDrag"
+            @touchstart="startDrag"
           >
             <div class="flex items-center gap-2">
               <div class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_5px_#00f0ff]"></div>
@@ -67,6 +68,7 @@
           <div 
             class="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-cyan-400 z-30 rounded-br-xl cursor-nwse-resize"
             @mousedown.stop="startResize"
+            @touchstart.stop="startResize"
           >
             <!-- 添加三条防滑纹理提示这是可拖拽区域 -->
             <div class="absolute bottom-1 right-1 w-3 h-3 flex flex-col items-end justify-end gap-[2px] opacity-70 pointer-events-none">
@@ -104,9 +106,16 @@ const emit = defineEmits(['update:visible'])
 // ================== 弹窗拖拽与缩放逻辑 ==================
 const modalRef = ref(null)
 
-// 初始位置和尺寸（相对于屏幕），默认在右侧
-const position = ref({ x: window.innerWidth / 2 + 50, y: 150 })
-const size = ref({ width: 450, height: 350 })
+// 初始位置和尺寸（相对于屏幕）
+const isMobile = window.innerWidth < 640
+const position = ref({
+  x: isMobile ? 16 : window.innerWidth / 2 + 50,
+  y: isMobile ? 80 : 150
+})
+const size = ref({
+  width: isMobile ? window.innerWidth - 32 : 450,
+  height: isMobile ? window.innerHeight * 0.5 : 350
+})
 
 // 拖拽状态
 let isDragging = false
@@ -120,41 +129,42 @@ let startModalSize = { w: 0, h: 0 }
 
 // 开始拖拽
 const startDrag = (e) => {
-  if (e.target.closest('button')) return // 点击关闭按钮时不触发拖拽
+  if (e.target.closest('button')) return
   isDragging = true
-  startDragPos = { x: e.clientX, y: e.clientY }
+  const point = e.touches ? e.touches[0] : e
+  startDragPos = { x: point.clientX, y: point.clientY }
   startModalPos = { x: position.value.x, y: position.value.y }
-  document.body.style.userSelect = 'none' // 防止拖拽时选中文本
+  document.body.style.userSelect = 'none'
 }
 
 // 开始缩放
 const startResize = (e) => {
   isResizing = true
-  startResizePos = { x: e.clientX, y: e.clientY }
+  const point = e.touches ? e.touches[0] : e
+  startResizePos = { x: point.clientX, y: point.clientY }
   startModalSize = { w: size.value.width, h: size.value.height }
   document.body.style.userSelect = 'none'
 }
 
-// 鼠标移动
-const onMouseMove = (e) => {
+// 移动
+const onMove = (e) => {
+  const point = e.touches ? e.touches[0] : e
   if (isDragging) {
-    const dx = e.clientX - startDragPos.x
-    const dy = e.clientY - startDragPos.y
-    // 限制不要拖出屏幕上方和左侧太远
-    position.value.x = Math.max(0, startModalPos.x + dx)
-    position.value.y = Math.max(0, startModalPos.y + dy)
+    const dx = point.clientX - startDragPos.x
+    const dy = point.clientY - startDragPos.y
+    position.value.x = Math.max(0, Math.min(window.innerWidth - 100, startModalPos.x + dx))
+    position.value.y = Math.max(0, Math.min(window.innerHeight - 60, startModalPos.y + dy))
   }
   if (isResizing) {
-    const dx = e.clientX - startResizePos.x
-    const dy = e.clientY - startResizePos.y
-    // 限制最小宽高
-    size.value.width = Math.max(300, startModalSize.w + dx)
-    size.value.height = Math.max(250, startModalSize.h + dy)
+    const dx = point.clientX - startResizePos.x
+    const dy = point.clientY - startResizePos.y
+    size.value.width = Math.max(280, startModalSize.w + dx)
+    size.value.height = Math.max(200, startModalSize.h + dy)
   }
 }
 
-// 鼠标松开
-const onMouseUp = () => {
+// 松开
+const onEnd = () => {
   isDragging = false
   isResizing = false
   document.body.style.userSelect = ''
@@ -162,20 +172,25 @@ const onMouseUp = () => {
 
 // 监听全局鼠标事件
 onMounted(() => {
-  window.addEventListener('mousemove', onMouseMove)
-  window.addEventListener('mouseup', onMouseUp)
-  
-  // 窗口缩放时调整默认初始位置，防止超出屏幕
+  window.addEventListener('mousemove', onMove)
+  window.addEventListener('mouseup', onEnd)
+  window.addEventListener('touchmove', onMove, { passive: false })
+  window.addEventListener('touchend', onEnd)
+
   window.addEventListener('resize', () => {
     if (!props.visible) {
-      position.value.x = window.innerWidth / 2 + 50
+      const mobile = window.innerWidth < 640
+      position.value = { x: mobile ? 16 : window.innerWidth / 2 + 50, y: mobile ? 80 : 150 }
+      size.value = { width: mobile ? window.innerWidth - 32 : 450, height: mobile ? window.innerHeight * 0.5 : 350 }
     }
   })
 })
 
 onUnmounted(() => {
-  window.removeEventListener('mousemove', onMouseMove)
-  window.removeEventListener('mouseup', onMouseUp)
+  window.removeEventListener('mousemove', onMove)
+  window.removeEventListener('mouseup', onEnd)
+  window.removeEventListener('touchmove', onMove)
+  window.removeEventListener('touchend', onEnd)
 })
 // ================== 地图核心逻辑 ==================
 
