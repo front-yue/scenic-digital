@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { Message } from '../utils/message'
+import { getConfigValue } from '../utils/config-store'
 
 export const useAvatarStore = defineStore('avatar', () => {
   const sdkInstance = ref(null)
@@ -23,8 +24,8 @@ export const useAvatarStore = defineStore('avatar', () => {
 
       const avatar = new window.XmovAvatar({
         containerId: '#sdk',
-        appId: import.meta.env.VITE_XMOV_APP_ID,
-        appSecret: import.meta.env.VITE_XMOV_APP_SECRET,
+        appId: getConfigValue('VITE_XMOV_APP_ID'),
+        appSecret: getConfigValue('VITE_XMOV_APP_SECRET'),
         gatewayServer: url.toString(),
         enableDebugger: false,
         onStateChange(state) {

@@ -2,143 +2,132 @@
   <transition name="fade-overlay">
     <div v-if="store.isInteractMode" class="fixed inset-0 z-40 flex items-center justify-center overflow-hidden">
       
-      <!-- 沉浸式背景：深色毛玻璃 + 动态网格 -->
+      <!-- 沉浸式背景 -->
       <div class="absolute inset-0 bg-black/80 backdrop-blur-xl tech-bg-photo"></div>
       
-      <!-- 主内容区：AI 照相馆悬浮舱 -->
-      <div class="relative w-[90%] max-w-[1200px] h-[80vh] flex tech-card transform-style-3d">
+      <!-- 主内容区：单屏状态驱动 -->
+      <div class="relative w-full h-full md:w-[90%] md:max-w-[700px] md:h-[90vh] flex flex-col tech-card transform-style-3d md:rounded-2xl overflow-hidden">
         
-        <!-- 左侧：实时摄像头画面 -->
-        <div class="flex-1 relative border-r border-[var(--app-glow-1)] flex flex-col items-center justify-center p-6">
-          
-          <!-- 标题栏 -->
-          <div class="absolute top-6 left-6 flex items-center gap-3 z-10">
-            <div class="w-3 h-3 rounded-full animate-pulse" style="background-color: var(--color-cyan-400); box-shadow: 0 0 10px var(--color-cyan-400);"></div>
-            <h2 class="text-2xl font-black text-transparent bg-clip-text tracking-widest font-mono bg-gradient-to-r from-[var(--color-cyan-300)] to-[var(--color-cyan-500)]">
+        <!-- 标题栏 (始终显示) -->
+        <div class="absolute top-0 left-0 right-0 z-20 flex items-center justify-between p-3 md:p-5">
+          <div class="flex items-center gap-2 md:gap-3">
+            <div class="w-2 h-2 md:w-3 md:h-3 rounded-full animate-pulse" style="background-color: var(--color-cyan-400); box-shadow: 0 0 10px var(--color-cyan-400);"></div>
+            <h2 class="text-base md:text-2xl font-black text-transparent bg-clip-text tracking-wider md:tracking-widest font-mono bg-gradient-to-r from-[var(--color-cyan-300)] to-[var(--color-cyan-500)]">
               AI 景区穿越照相馆
             </h2>
           </div>
-          
-          <!-- 退出按钮 -->
           <button 
             @click="exitPhotoRoom"
-            class="absolute top-6 right-6 px-4 py-2 border border-red-500/50 text-red-400 rounded hover:bg-red-500/20 hover:text-red-300 transition-all z-10 flex items-center gap-2"
+            class="px-3 py-1.5 md:px-4 md:py-2 border border-red-500/50 text-red-400 rounded hover:bg-red-500/20 hover:text-red-300 transition-all flex items-center gap-1.5 md:gap-2 text-xs md:text-base"
           >
-            <XCircleIcon class="w-5 h-5" />
+            <XCircleIcon class="w-4 h-4 md:w-5 md:h-5" />
             退出
           </button>
+        </div>
 
-          <!-- 摄像头容器 (带科幻边框) -->
-          <div class="relative w-full max-w-[450px] aspect-[3/4] border-2 rounded-lg overflow-hidden mt-10 group" style="border-color: rgba(var(--color-cyan-500), 0.3); box-shadow: 0 0 30px rgba(var(--color-cyan-500), 0.1);">
+        <!-- ========== 状态一：拍照区 ========= -->
+        <transition name="fade-step" mode="out-in">
+          <div v-if="!isProcessing && !resultImage" key="camera" class="flex-1 flex flex-col items-center justify-center p-4 md:p-6">
             
-            <!-- 取景框角标 -->
-            <div class="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 z-10" style="border-color: var(--color-cyan-400);"></div>
-            <div class="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 z-10" style="border-color: var(--color-cyan-400);"></div>
-            <div class="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 z-10" style="border-color: var(--color-cyan-400);"></div>
-            <div class="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 z-10" style="border-color: var(--color-cyan-400);"></div>
+            <!-- 摄像头容器 -->
+            <div class="relative w-full max-w-[300px] md:max-w-[420px] aspect-[3/4] border-2 rounded-lg overflow-hidden group" style="border-color: rgba(var(--color-cyan-500), 0.3); box-shadow: 0 0 30px rgba(var(--color-cyan-500), 0.1);">
+              <!-- 取景框角标 -->
+              <div class="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 z-10" style="border-color: var(--color-cyan-400);"></div>
+              <div class="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 z-10" style="border-color: var(--color-cyan-400);"></div>
+              <div class="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 z-10" style="border-color: var(--color-cyan-400);"></div>
+              <div class="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 z-10" style="border-color: var(--color-cyan-400);"></div>
 
-            <!-- 扫描线动画 -->
-            <div class="absolute inset-0 w-full h-[10%] animate-scanline z-10 pointer-events-none scanline-gradient"></div>
+              <div class="absolute inset-0 w-full h-[10%] animate-scanline z-10 pointer-events-none scanline-gradient"></div>
 
-            <!-- 摄像头 Video 元素 -->
-            <video 
-              ref="videoElement" 
-              class="w-full h-full object-cover scale-x-[-1]" 
-              autoplay 
-              playsinline
-              muted
-            ></video>
+              <video ref="videoElement" class="w-full h-full object-cover scale-x-[-1]" autoplay playsinline muted></video>
 
-            <!-- 状态提示覆盖层 -->
-            <div v-if="!cameraReady && !cameraError" class="absolute inset-0 flex flex-col items-center justify-center bg-black/60 z-20">
-              <Loader2Icon class="w-10 h-10 animate-spin mb-4" style="color: var(--color-cyan-400);" />
-              <p class="font-mono tracking-widest" style="color: var(--color-cyan-300);">初始化光学传感器...</p>
-            </div>
-            
-            <div v-if="cameraError" class="absolute inset-0 flex flex-col items-center justify-center bg-black/80 z-20">
-              <AlertTriangleIcon class="w-12 h-12 text-red-500 mb-4" />
-              <p class="text-red-400">{{ cameraError }}</p>
-              <button @click="initCamera" class="mt-4 px-4 py-2 border hover:bg-[var(--color-cyan-500)]/20 transition-colors" style="color: var(--color-cyan-400); border-color: var(--color-cyan-500);">
-                重试
-              </button>
-            </div>
-            
-            <!-- 倒计时覆盖层 -->
-            <div v-if="isCountingDown" class="absolute inset-0 flex items-center justify-center bg-black/40 z-30">
-              <span class="text-9xl font-black text-white text-shadow-glow animate-ping-slow countdown-shadow">
-                {{ countdown }}
-              </span>
-            </div>
-
-            <!-- 拍照闪光层 -->
-            <div v-if="showFlash" class="absolute inset-0 bg-white z-40 animate-flash pointer-events-none"></div>
-          </div>
-
-          <!-- 控制台区 -->
-          <div class="mt-8 flex flex-col items-center gap-4">
-             <button 
-              @click="takePhoto"
-              :disabled="!cameraReady || isCountingDown || isProcessing"
-              class="relative group"
-            >
-              <div class="absolute -inset-1 rounded-full blur opacity-50 group-hover:opacity-100 transition duration-200 group-disabled:opacity-0 bg-gradient-to-r from-[var(--color-cyan-400)] to-[var(--color-cyan-600)]"></div>
-              <div class="relative px-8 py-3 bg-black rounded-full border flex items-center gap-3 group-disabled:border-gray-600 group-disabled:text-gray-500" style="border-color: var(--color-cyan-500);">
-                <CameraIcon class="w-6 h-6 group-disabled:text-gray-500" style="color: var(--color-cyan-400);" />
-                <span class="text-lg font-bold tracking-widest group-disabled:text-gray-500" style="color: var(--color-cyan-300);">
-                  {{ isProcessing ? 'AI 融合中...' : '生成穿越海报' }}
+              <!-- 初始化中 -->
+              <div v-if="!cameraReady && !cameraError" class="absolute inset-0 flex flex-col items-center justify-center bg-black/60 z-20">
+                <Loader2Icon class="w-10 h-10 animate-spin mb-4" style="color: var(--color-cyan-400);" />
+                <p class="font-mono tracking-widest text-sm" style="color: var(--color-cyan-300);">初始化光学传感器...</p>
+              </div>
+              
+              <!-- 摄像头错误 -->
+              <div v-if="cameraError" class="absolute inset-0 flex flex-col items-center justify-center bg-black/80 z-20">
+                <AlertTriangleIcon class="w-12 h-12 text-red-500 mb-4" />
+                <p class="text-red-400 text-sm">{{ cameraError }}</p>
+                <button @click="initCamera" class="mt-4 px-4 py-2 border text-sm hover:bg-[var(--color-cyan-500)]/20 transition-colors" style="color: var(--color-cyan-400); border-color: var(--color-cyan-500);">
+                  重试
+                </button>
+              </div>
+              
+              <!-- 倒计时 -->
+              <div v-if="isCountingDown" class="absolute inset-0 flex items-center justify-center bg-black/40 z-30">
+                <span class="text-9xl font-black text-white text-shadow-glow animate-ping-slow countdown-shadow">
+                  {{ countdown }}
                 </span>
               </div>
-            </button>
-            <p class="text-sm font-mono opacity-60" style="color: var(--color-cyan-500);">请注视镜头并保持微笑</p>
-          </div>
-        </div>
 
-        <!-- 右侧：生成结果展示区 -->
-        <div class="w-[400px] bg-black/20 p-6 flex flex-col relative overflow-hidden">
-          <!-- 装饰背景 -->
-          <div class="absolute -top-20 -right-20 w-64 h-64 rounded-full blur-3xl opacity-10" style="background-color: var(--color-cyan-500);"></div>
-          
-          <h3 class="text-xl font-bold mb-6 flex items-center gap-2" style="color: var(--color-cyan-300);">
-            <ImageIcon class="w-5 h-5" />
-            合成影像结果
-          </h3>
-
-          <!-- 图片占位/展示区 -->
-          <div class="flex-1 w-full border border-dashed rounded-lg flex flex-col items-center justify-center relative overflow-hidden group bg-black/30" style="border-color: rgba(var(--color-cyan-500), 0.3);">
-            <template v-if="!resultImage && !isProcessing">
-              <UserFocusIcon class="w-16 h-16 mb-4 opacity-50" style="color: var(--color-cyan-900);" />
-              <p class="font-mono text-center opacity-70" style="color: var(--color-cyan-700);">等待拍摄...<br>照片将显示在此处</p>
-            </template>
-            
-            <template v-if="isProcessing">
-               <div class="flex flex-col items-center w-3/4">
-                 <div class="w-full h-2 bg-gray-800 rounded-full overflow-hidden mb-4">
-                   <div class="h-full animate-progress bg-gradient-to-r from-[var(--color-cyan-500)] to-[var(--color-cyan-300)]"></div>
-                 </div>
-                 <p class="text-sm animate-pulse" style="color: var(--color-cyan-400);">AI 正在进行风格迁移与融合渲染...</p>
-               </div>
-            </template>
-
-            <img 
-              v-if="resultImage" 
-              :src="resultImage" 
-              class="w-full h-full object-contain z-10"
-              alt="合成结果" 
-            />
-          </div>
-
-          <!-- 扫码区 -->
-          <div class="mt-6 h-[120px] border rounded-lg p-4 flex items-center gap-4 bg-black/20" :class="{ 'opacity-30': !resultImage }" style="border-color: rgba(var(--color-cyan-500), 0.3);">
-            <div class="w-[80px] h-[80px] bg-white rounded p-1">
-              <!-- 这里可以用真实二维码组件替换，目前用占位图 -->
-              <QrCodeIcon class="w-full h-full text-black" />
+              <!-- 闪光 -->
+              <div v-if="showFlash" class="absolute inset-0 bg-white z-40 animate-flash pointer-events-none"></div>
             </div>
-            <div class="flex-1">
-              <h4 class="font-bold mb-1" style="color: var(--color-cyan-300);">扫描获取高清大图</h4>
-              <p class="text-xs leading-relaxed opacity-80" style="color: var(--color-cyan-500);">请使用微信或浏览器扫描左侧二维码，将照片保存至手机。</p>
+
+            <!-- 拍照按钮 -->
+            <div class="mt-6 md:mt-8 flex flex-col items-center gap-3">
+              <button @click="takePhoto" :disabled="!cameraReady || isCountingDown" class="relative group">
+                <div class="absolute -inset-1 rounded-full blur opacity-50 group-hover:opacity-100 transition duration-200 group-disabled:opacity-0 bg-gradient-to-r from-[var(--color-cyan-400)] to-[var(--color-cyan-600)]"></div>
+                <div class="relative px-6 py-2.5 md:px-8 md:py-3 bg-black rounded-full border flex items-center gap-2 md:gap-3 group-disabled:border-gray-600 group-disabled:text-gray-500" style="border-color: var(--color-cyan-500);">
+                  <CameraIcon class="w-5 h-5 md:w-6 md:h-6 group-disabled:text-gray-500" style="color: var(--color-cyan-400);" />
+                  <span class="text-sm md:text-lg font-bold tracking-wider md:tracking-widest group-disabled:text-gray-500" style="color: var(--color-cyan-300);">生成穿越海报</span>
+                </div>
+              </button>
+              <p class="text-xs md:text-sm font-mono opacity-60" style="color: var(--color-cyan-500);">请注视镜头并保持微笑</p>
             </div>
           </div>
-        </div>
+
+          <!-- ========== 状态二：AI 处理中 ========= -->
+          <div v-else-if="isProcessing && !resultImage" key="processing" class="flex-1 flex flex-col items-center justify-center p-6">
+            <!-- 处理中的抓拍图（模糊背景） -->
+            <div class="relative w-full max-w-[300px] md:max-w-[420px] aspect-[3/4] rounded-lg overflow-hidden border-2" style="border-color: rgba(var(--color-cyan-500), 0.3);">
+              <img v-if="capturedPreview" :src="capturedPreview" class="w-full h-full object-cover scale-105 blur-sm" alt="抓拍预览" />
+              <div class="absolute inset-0 bg-black/50 flex flex-col items-center justify-center">
+                <div class="w-16 h-16 md:w-20 md:h-20 rounded-full border-4 border-t-transparent animate-spin mb-6" style="border-color: var(--color-cyan-400); border-top-color: transparent;"></div>
+                <p class="text-lg md:text-xl font-bold font-mono tracking-widest mb-3" style="color: var(--color-cyan-300);">AI 风格迁移中</p>
+                <div class="w-48 md:w-64 h-2 bg-gray-800 rounded-full overflow-hidden">
+                  <div class="h-full animate-progress bg-gradient-to-r from-[var(--color-cyan-500)] to-[var(--color-cyan-300)]"></div>
+                </div>
+                <p class="text-xs md:text-sm mt-3 animate-pulse opacity-70" style="color: var(--color-cyan-500);">正在进行融合渲染，请稍候...</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ========== 状态三：结果展示 ========= -->
+          <div v-else-if="resultImage" key="result" class="flex-1 flex flex-col items-center justify-center p-4 md:p-6">
+            <!-- 生成的图片 -->
+            <div class="relative w-full max-w-[300px] md:max-w-[420px] aspect-[3/4] rounded-lg overflow-hidden border-2" style="border-color: rgba(var(--color-cyan-500), 0.5); box-shadow: 0 0 40px rgba(var(--color-cyan-500), 0.15);">
+              <img :src="resultImage" class="w-full h-full object-cover" alt="合成结果" />
+              <!-- 成功标识 -->
+              <div class="absolute top-3 left-3 px-3 py-1 rounded-full bg-emerald-500/80 backdrop-blur-sm text-xs font-bold text-white flex items-center gap-1.5">
+                <CheckCircleIcon class="w-3.5 h-3.5" /> 生成完成
+              </div>
+            </div>
+
+            <!-- 操作区 -->
+            <div class="mt-5 md:mt-6 flex flex-col items-center gap-4 w-full max-w-[420px]">
+              <!-- 扫码区 -->
+              <div class="w-full border rounded-lg p-3 md:p-4 flex items-center gap-3 md:gap-4 bg-black/30" style="border-color: rgba(var(--color-cyan-500), 0.3);">
+                <div class="w-[56px] h-[56px] md:w-[70px] md:h-[70px] bg-white rounded p-1 flex-shrink-0">
+                  <QrCodeIcon class="w-full h-full text-black" />
+                </div>
+                <div class="flex-1">
+                  <h4 class="font-bold mb-0.5 text-sm md:text-base" style="color: var(--color-cyan-300);">扫描获取高清大图</h4>
+                  <p class="text-[10px] md:text-xs leading-relaxed opacity-80" style="color: var(--color-cyan-500);">请使用微信或浏览器扫描二维码，将照片保存至手机。</p>
+                </div>
+              </div>
+
+              <!-- 重新拍摄按钮 -->
+              <button @click="retakePhoto" class="flex items-center gap-2 px-5 py-2.5 md:px-6 md:py-3 rounded-full border transition-all hover:bg-[var(--color-cyan-500)]/10" style="border-color: var(--color-cyan-500); color: var(--color-cyan-300);">
+                <RotateCcwIcon class="w-4 h-4 md:w-5 md:h-5" />
+                <span class="text-sm md:text-base font-bold tracking-wider">重新拍摄</span>
+              </button>
+            </div>
+          </div>
+        </transition>
 
       </div>
     </div>
@@ -146,15 +135,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { ref, onUnmounted, watch } from 'vue'
 import { 
   XCircle as XCircleIcon, 
   Camera as CameraIcon,
   Loader2 as Loader2Icon,
   AlertTriangle as AlertTriangleIcon,
-  Image as ImageIcon,
-  User as UserFocusIcon,
-  QrCode as QrCodeIcon
+  QrCode as QrCodeIcon,
+  CheckCircle as CheckCircleIcon,
+  RotateCcw as RotateCcwIcon
 } from 'lucide-vue-next'
 import { useScenicStore } from '@/stores/scenic'
 
@@ -172,6 +161,7 @@ const countdown = ref(3)
 const showFlash = ref(false)
 const isProcessing = ref(false)
 const resultImage = ref(null)
+const capturedPreview = ref(null) // 抓拍后的预览图（处理中显示）
 
 // 初始化摄像头
 const initCamera = async () => {
@@ -216,11 +206,10 @@ const exitPhotoRoom = () => {
 // 监听模式切换
 watch(() => store.isInteractMode, (newVal) => {
   if (newVal) {
-    // 延迟一点初始化摄像头，等弹窗动画差不多完成
-    setTimeout(() => {
-      initCamera()
-    }, 300)
+    setTimeout(() => { initCamera() }, 300)
     resultImage.value = null
+    capturedPreview.value = null
+    isProcessing.value = false
   } else {
     stopCamera()
   }
@@ -233,6 +222,7 @@ const takePhoto = () => {
   isCountingDown.value = true
   countdown.value = 3
   resultImage.value = null
+  capturedPreview.value = null
   
   const timer = setInterval(() => {
     countdown.value--
@@ -244,15 +234,22 @@ const takePhoto = () => {
   }, 1000)
 }
 
+// 重新拍摄
+const retakePhoto = () => {
+  resultImage.value = null
+  capturedPreview.value = null
+  isProcessing.value = false
+  // 摄像头保持开启，直接回到拍照状态
+}
+
 // 执行抓拍和模拟 AI 处理
 const executeCapture = () => {
   // 1. 闪光灯特效
   showFlash.value = true
   setTimeout(() => { showFlash.value = false }, 150)
 
-  // 2. 截取画面到 Canvas (获取纯净的人物原图)
+  // 2. 截取画面到 Canvas
   const canvas = document.createElement('canvas')
-  // 强制生成竖屏比例 (3:4) 的图片，以匹配取景框
   const targetRatio = 3 / 4;
   const vW = videoElement.value.videoWidth
   const vH = videoElement.value.videoHeight
@@ -261,39 +258,31 @@ const executeCapture = () => {
   let sourceX = 0, sourceY = 0, sourceWidth = vW, sourceHeight = vH;
 
   if (videoRatio > targetRatio) {
-    // 视频太宽了，需要裁切掉左右两边
     sourceWidth = vH * targetRatio;
     sourceX = (vW - sourceWidth) / 2;
   } else {
-    // 视频太高了，需要裁切掉上下两边
     sourceHeight = vW / targetRatio;
     sourceY = (vH - sourceHeight) / 2;
   }
 
-  canvas.width = 900 // 固定输出宽度
-  canvas.height = 1200 // 固定输出高度，保持 3:4
+  canvas.width = 900
+  canvas.height = 1200
   const ctx = canvas.getContext('2d')
-  
-  // 处理镜像翻转
   ctx.translate(canvas.width, 0)
   ctx.scale(-1, 1)
-  
-  // 将计算好的居中裁切区域绘制到 Canvas 上
   ctx.drawImage(videoElement.value, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, canvas.width, canvas.height)
   
   const base64Image = canvas.toDataURL('image/jpeg', 0.8)
   
-  // 3. 进入处理状态
+  // 3. 保存抓拍预览并进入处理状态
+  capturedPreview.value = base64Image
   isProcessing.value = true
   
-  // TODO: 后续在这里将 base64Image 发送给后端的 AI 生图接口
-  // 请求体示例: { "image": base64Image, "prompt": "人物与赛博朋克风景融合..." }
+  // TODO: 后续将 base64Image 发送给后端 AI 生图接口
   
-  // 目前用 setTimeout 模拟网络请求和 AI 生成时间
+  // 模拟 AI 生成时间
   setTimeout(() => {
     isProcessing.value = false
-    // 模拟后端返回了生成好的带有风景的 AI 图像
-    // 这里暂且展示游客的原图截屏
     resultImage.value = base64Image
   }, 3000)
 }
@@ -364,4 +353,10 @@ onUnmounted(() => {
   100% { width: 100%; }
 }
 .animate-progress { animation: progress 3s ease-in-out forwards; }
+
+/* 步骤切换过渡 */
+.fade-step-enter-active { transition: opacity 0.5s ease, transform 0.5s ease; }
+.fade-step-leave-active { transition: opacity 0.3s ease, transform 0.3s ease; }
+.fade-step-enter-from { opacity: 0; transform: translateY(20px); }
+.fade-step-leave-to { opacity: 0; transform: translateY(-20px); }
 </style>
