@@ -22,6 +22,8 @@
 
 ## 📺 项目展示
 
+### 桌面端 / 大屏
+
 ![平台主界面-未唤醒状态](README/01.png)
 *平台主界面（数字向导未唤醒状态）*
 
@@ -30,6 +32,20 @@
 
 ![系统数据管理后台](README/03.png)
 *沉浸式系统数据管理控制台（支持本地图片上传）*
+
+### 移动端
+
+<p align="center">
+  <img src="README/移动端数字人.png" width="30%" alt="移动端数字人" />
+  &nbsp;&nbsp;
+  <img src="README/移动端地图.png" width="30%" alt="移动端地图" />
+  &nbsp;&nbsp;
+  <img src="README/移动端AI相机.png" width="30%" alt="移动端AI相机" />
+</p>
+
+<p align="center">
+  <em>移动端体验：数字人伴游 · 智能地图导航 · AI 穿越照相馆</em>
+</p>
 
 ---
 
