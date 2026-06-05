@@ -91,11 +91,11 @@
         <LeftPanel v-show="!store.isInteractMode" class="transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]" />
       </transition>
       
-      <CenterPanel />
+      <CenterPanel ref="centerPanelRef" />
 
       <!-- 右侧面板：带平滑退场动画 -->
       <transition name="panel-right">
-        <RightPanel v-show="!store.isInteractMode" class="transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]" />
+        <RightPanel v-show="!store.isInteractMode" @locate-spot="handleLocateSpot" class="transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]" />
       </transition>
 
     </main>
@@ -124,6 +124,14 @@ import { getConfig } from '@/api/config'
 
 const store = useScenicStore()
 const router = useRouter()
+
+// CenterPanel 引用 & 景点定位转发
+const centerPanelRef = ref(null)
+const handleLocateSpot = (payload) => {
+  if (centerPanelRef.value?.locateSpot) {
+    centerPanelRef.value.locateSpot(payload)
+  }
+}
 
 // 动态时间
 const currentTime = ref('');

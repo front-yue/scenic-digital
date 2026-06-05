@@ -86,37 +86,45 @@
       </div>
     </div>
 
-    <!-- 卡片 4：客流监控 -->
-    <div class="tech-card p-5 flex flex-col gap-4 relative border-emerald-500/20 bg-[#021815]/60 shrink-0 overflow-hidden">
+    <!-- 卡片 4：推荐游览路线 -->
+    <div class="tech-card p-5 flex flex-col gap-3 relative border-emerald-500/20 bg-[#021815]/60 shrink-0 overflow-hidden">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
           <div class="w-2 h-4 bg-emerald-400"></div>
-          <h3 class="text-md font-bold text-white tracking-wider">实时客流监控</h3>
+          <h3 class="text-md font-bold text-white tracking-wider">推荐游览路线</h3>
         </div>
-        <div class="flex gap-1 items-center">
-          <div class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></div>
-          <span class="text-[10px] text-emerald-400 font-mono">LIVE</span>
-        </div>
+        <Compass class="w-4 h-4 text-emerald-400/60" />
       </div>
-      
-      <div class="flex justify-between items-end mt-1">
-        <div class="flex flex-col">
-          <span class="text-xs text-emerald-100/60 mb-1">当前在园人数</span>
-          <div class="flex items-baseline gap-2">
-             <span class="text-3xl font-black text-emerald-300 tracking-wider font-mono">{{ store.totalVisitors }}</span>
-             <span class="text-xs text-emerald-100/40">人</span>
-          </div>
+
+      <!-- 路线 1：经典一日游 -->
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2">
+          <div class="px-2 py-0.5 rounded border border-emerald-400/40 bg-emerald-400/10 text-[10px] text-emerald-300 font-bold">经典线</div>
+          <span class="text-[10px] text-emerald-100/50 font-mono">约 3 小时</span>
         </div>
-        <div class="flex flex-col items-end">
-          <span class="text-xs text-emerald-100/60 mb-1">舒适度指数</span>
-          <span class="px-3 py-1 rounded border border-emerald-400/50 bg-emerald-400/10 text-emerald-300 text-sm font-bold shadow-[0_0_10px_rgba(52,211,153,0.2)]">
-            {{ store.overallStatus }}
+        <div class="flex items-center gap-1 flex-wrap">
+          <span v-for="(spot, i) in routeClassic" :key="'c' + i" class="text-xs text-emerald-100/80">
+            {{ spot }}<span v-if="i < routeClassic.length - 1" class="text-emerald-500/40 mx-1">→</span>
           </span>
         </div>
       </div>
-      
-      <div class="h-6 w-full flex items-end gap-[2px] opacity-60 mt-1">
-         <div v-for="i in 40" :key="`flow-${i}`" class="flex-1 bg-emerald-500/40 rounded-t-sm" :style="`height: ${20 + Math.random() * 80}%; animation: wave ${0.5 + Math.random()}s infinite alternate;`"></div>
+
+      <!-- 路线 2：文化深度游 -->
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2">
+          <div class="px-2 py-0.5 rounded border border-teal-400/40 bg-teal-400/10 text-[10px] text-teal-300 font-bold">文化线</div>
+          <span class="text-[10px] text-emerald-100/50 font-mono">约 2 小时</span>
+        </div>
+        <div class="flex items-center gap-1 flex-wrap">
+          <span v-for="(spot, i) in routeCulture" :key="'w' + i" class="text-xs text-emerald-100/80">
+            {{ spot }}<span v-if="i < routeCulture.length - 1" class="text-emerald-500/40 mx-1">→</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- 底部波浪装饰条 -->
+      <div class="h-4 w-full flex items-end gap-[2px] opacity-50 mt-1">
+        <div v-for="i in 40" :key="`wave-${i}`" class="flex-1 bg-emerald-500/40 rounded-t-sm" :style="`height: ${20 + Math.random() * 80}%; animation: wave ${0.5 + Math.random()}s infinite alternate;`"></div>
       </div>
     </div>
   </aside>
@@ -124,10 +132,14 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import { Sun, Ticket, Clock as ClockIcon, MapPin } from 'lucide-vue-next'
+import { Sun, Ticket, Clock as ClockIcon, MapPin, Compass } from 'lucide-vue-next'
 import { useScenicStore } from '../../stores/scenic'
 
 const store = useScenicStore()
+
+// 推荐路线数据
+const routeClassic = ['断桥残雪', '白堤', '孤山', '苏堤春晓', '雷峰塔']
+const routeCulture = ['岳王庙', '西泠印社', '曲院风荷', '三潭印月']
 
 // 自动滚动逻辑
 const introScrollContainer = ref(null);

@@ -149,14 +149,6 @@
         </div>
       </div>
 
-    <!-- 地图弹窗 -->
-    <MapModal
-      :visible="isMapVisible"
-      @update:visible="isMapVisible = $event"
-      :originCoord="mapOriginCoord"
-      :destCoord="mapDestCoord"
-    />
-
     <!-- AI 照相馆弹窗 -->
     <AIPhotoOverlay />
 
@@ -194,7 +186,6 @@ import { getConfig } from '@/api/config'
 import { getAudioConfig, toggleMicrophone, startFayLive, stopFayLive, getFayStatus, sendFayMessage } from '@/api/fay'
 import { getGeocode } from '@/api/map'
 import { Message } from '@/utils/message'
-import MapModal from '@/components/scenic/MapModal.vue'
 import AIPhotoOverlay from '@/components/photo/AIPhotoOverlay.vue'
 import VersionModal from '@/components/common/VersionModal.vue'
 import ConfigPanel from '@/components/common/ConfigPanel.vue'
@@ -213,11 +204,6 @@ const isFayRunning = ref(false)
 const fayMessage = ref('')
 const chatMessage = ref('')
 const isSending = ref(false)
-
-// 地图弹窗
-const isMapVisible = ref(false)
-const mapOriginCoord = ref('')
-const mapDestCoord = ref('')
 
 // =========== 时间 ===========
 let timeInterval
@@ -270,31 +256,13 @@ watch(wsData, (newData) => {
 })
 
 // =========== 地图导航 ===========
-const triggerMapNav = async (origin, dest) => {
-  if (origin === '当前位置') origin = store.scenicInfo?.address
-  if (dest === '当前位置') dest = store.scenicInfo?.address
-  const [originRes, destRes] = await Promise.all([getGeocode(origin), getGeocode(dest)])
-  if (originRes.code === 200 && destRes.code === 200) {
-    mapOriginCoord.value = originRes.data.location
-    mapDestCoord.value = destRes.data.location
-    isMapVisible.value = true
-  }
+const triggerMapNav = () => {
+  // 移动端不绘制地图路线，仅提示
+  Message.info('导航功能请在大屏端体验')
 }
 
-const showCurrentLocation = async () => {
-  const currentAddress = store.scenicInfo?.address
-  if (!currentAddress) {
-    Message.warning('景区位置未配置')
-    return
-  }
-  const res = await getGeocode(currentAddress)
-  if (res && res.code === 200) {
-    mapOriginCoord.value = res.data.location
-    mapDestCoord.value = ''
-    isMapVisible.value = true
-  } else {
-    Message.error('定位失败')
-  }
+const showCurrentLocation = () => {
+  Message.info('移动端地图功能请在大屏端体验')
 }
 
 // =========== 控制按钮 ===========

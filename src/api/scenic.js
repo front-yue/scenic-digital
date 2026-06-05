@@ -26,10 +26,10 @@ export const updateScenicInfo = (id, data) => {
 };
 
 
-// =================== 景点列表与客流 API ===================
+// =================== 景点列表 API ===================
 
 /**
- * 获取所有景点列表及其客流状态
+ * 获取所有景点列表（含经纬度）
  */
 export const getScenicSpots = () => {
   return scenicRequest({
@@ -71,19 +71,6 @@ export const deleteScenicSpot = (id) => {
   return scenicRequest({
     url: `/api/scenic/spots/${id}`,
     method: 'delete'
-  });
-};
-
-/**
- * 更新景点当前客流 (用于演示控制)
- * @param {Number} id 景点ID
- * @param {Number} current_visitors 当前人数
- */
-export const updateSpotFlow = (id, current_visitors) => {
-  return scenicRequest({
-    url: `/api/scenic/spots/${id}/flow`,
-    method: 'put',
-    data: { current_visitors }
   });
 };
 
