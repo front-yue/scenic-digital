@@ -32,7 +32,7 @@
               </div>
               <p class="text-sm text-emerald-100/60 line-clamp-2 mb-2">{{ spot.description || '暂无简介' }}</p>
               <div class="flex items-center gap-4 text-xs text-emerald-400/80">
-                <span class="flex items-center gap-1"><Users class="w-3.5 h-3.5" /> 最大承载: <b class="text-emerald-300">{{ spot.max_capacity }}</b></span>
+                <span class="flex items-center gap-1"><MapPin class="w-3.5 h-3.5" /> 经纬度: <b class="text-emerald-300">{{ spot.latitude || '-' }}, {{ spot.longitude || '-' }}</b></span>
                 <span>排序权重: {{ spot.sort_order }}</span>
               </div>
             </div>
@@ -68,8 +68,17 @@
               <input v-model="spotForm.en_name" type="text" class="bg-emerald-900/20 border border-emerald-500/30 rounded px-3 py-2 text-sm text-emerald-100 focus:border-emerald-400 outline-none" />
             </div>
             <div class="flex flex-col gap-1">
-              <label class="text-xs text-emerald-100/70">最大承载量 (人)</label>
-              <input v-model.number="spotForm.max_capacity" type="number" class="bg-emerald-900/20 border border-emerald-500/30 rounded px-3 py-2 text-sm text-emerald-100 focus:border-emerald-400 outline-none" />
+              <label class="text-xs text-emerald-100/70">景点经纬度</label>
+              <div class="flex gap-3">
+                <div class="flex-1 flex flex-col gap-1">
+                  <span class="text-[10px] text-emerald-400/60">纬度 latitude</span>
+                  <input v-model="spotForm.latitude" type="number" step="0.000001" class="bg-emerald-900/20 border border-emerald-500/30 rounded px-3 py-2 text-sm text-emerald-100 focus:border-emerald-400 outline-none" placeholder="30.2368" />
+                </div>
+                <div class="flex-1 flex flex-col gap-1">
+                  <span class="text-[10px] text-emerald-400/60">经度 longitude</span>
+                  <input v-model="spotForm.longitude" type="number" step="0.000001" class="bg-emerald-900/20 border border-emerald-500/30 rounded px-3 py-2 text-sm text-emerald-100 focus:border-emerald-400 outline-none" placeholder="120.1475" />
+                </div>
+              </div>
             </div>
             <div class="flex flex-col gap-1">
               <label class="text-xs text-emerald-100/70 mb-1">景点图片</label>
@@ -122,7 +131,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { Plus, Edit, Trash2, X, Loader2, Upload, Image as ImageIcon, Users } from 'lucide-vue-next'
+import { Plus, Edit, Trash2, X, Loader2, Upload, Image as ImageIcon, MapPin } from 'lucide-vue-next'
 import { getScenicSpots, addScenicSpot, updateScenicSpot, deleteScenicSpot, uploadImage } from '@/api/scenic'
 import { Message } from '@/utils/message'
 
@@ -134,10 +143,7 @@ const fetchData = async () => {
   try {
     const res = await getScenicSpots()
     if (res && res.status === 'success') {
-      spotList.value = (res.data || []).map(spot => ({
-        ...spot,
-        temp_visitors: spot.current_visitors || 0
-      }))
+      spotList.value = res.data || []
     }
   } catch (error) {
     console.error('获取景点列表失败:', error)
@@ -155,7 +161,8 @@ const spotForm = ref({
   id: null,
   spot_name: '',
   en_name: '',
-  max_capacity: 1000,
+  latitude: '',
+  longitude: '',
   image_url: '',
   description: ''
 })
@@ -170,7 +177,8 @@ const openModal = (spot = null) => {
       id: null,
       spot_name: '',
       en_name: '',
-      max_capacity: 1000,
+      latitude: '',
+      longitude: '',
       image_url: '',
       description: ''
     }
@@ -179,8 +187,8 @@ const openModal = (spot = null) => {
 }
 
 const handleSave = async () => {
-  if (!spotForm.value.spot_name || !spotForm.value.max_capacity) {
-    return Message.warning('请填写景点名称和最大承载量')
+  if (!spotForm.value.spot_name || !spotForm.value.latitude || !spotForm.value.longitude) {
+    return Message.warning('请填写景点名称和经纬度')
   }
 
   saving.value = true

@@ -7,9 +7,9 @@ spot_service = SpotService()
 
 @spot_bp.route('/spots', methods=['GET'])
 def get_scenic_spots():
-    """获取景点及客流状态接口"""
+    """获取景点列表（含经纬度）"""
     try:
-        data = spot_service.get_scenic_spots_with_flow()
+        data = spot_service.get_scenic_spots()
         return ApiResponse.success(data)
     except Exception as e:
         return ApiResponse.error(f"获取景点列表失败: {str(e)}")
@@ -43,13 +43,3 @@ def delete_spot(spot_id):
     except Exception as e:
         return ApiResponse.error(str(e))
 
-@spot_bp.route('/spots/<int:spot_id>/flow', methods=['PUT'])
-def update_spot_flow(spot_id):
-    """更新景点实时客流（用于演示联动效果）"""
-    data = request.get_json()
-    current_visitors = data.get('current_visitors', 0)
-    try:
-        spot_service.update_flow(spot_id, current_visitors)
-        return ApiResponse.success({}, "客流更新成功")
-    except Exception as e:
-        return ApiResponse.error(str(e))

@@ -45,34 +45,6 @@
           </div>
         </section>
 
-        <!-- 客流模拟器 -->
-        <section class="bg-emerald-900/10 border border-emerald-500/20 rounded-lg p-4 md:p-5">
-          <h4 class="text-emerald-100 font-bold flex items-center gap-2 mb-3 md:mb-4"><Activity class="w-5 h-5 text-emerald-400" /> 客流压力模拟器</h4>
-          <p class="text-xs text-emerald-100/50 mb-3 md:mb-4">调整以下景点人数并保存，以在右侧面板及地图上观察拥挤预警联动效果。</p>
-          <div class="flex flex-col gap-3">
-            <div v-if="loadingSpots" class="text-emerald-400/60 flex items-center gap-2">
-              <Loader2 class="w-5 h-5 animate-spin" /> 加载景点数据中...
-            </div>
-            <div v-else v-for="spot in spotList" :key="spot.id" class="bg-[#020b14] border border-emerald-500/10 p-3 rounded space-y-2 sm:space-y-0 sm:flex sm:items-center sm:gap-4">
-              <!-- 景点名称 -->
-              <div class="flex items-center justify-between sm:w-32 sm:flex-shrink-0">
-                <span class="text-sm font-medium text-emerald-100 truncate">{{ spot.spot_name }}</span>
-                <span class="text-[10px] text-emerald-500/50 sm:hidden">{{ spot.temp_visitors }}/{{ spot.max_capacity }}</span>
-              </div>
-              <!-- 滑动条 -->
-              <input type="range" v-model.number="spot.temp_visitors" :max="spot.max_capacity * 1.5" min="0" class="w-full sm:flex-1 accent-emerald-500" />
-              <!-- 数值 + 按钮 -->
-              <div class="flex items-center gap-2">
-                <input type="number" v-model.number="spot.temp_visitors" class="w-20 bg-emerald-900/30 border border-emerald-500/30 rounded px-2 py-1.5 text-sm text-emerald-100 text-center" />
-                <span class="text-xs text-emerald-500/60 hidden sm:inline flex-1">/ {{ spot.max_capacity }} MAX</span>
-                <button @click="applyFlow(spot)" class="px-3 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/40 border border-emerald-400/50 rounded text-emerald-300 text-xs transition-colors ml-auto sm:ml-0">
-                  应用
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
-
       </div>
     </div>
   </div>
@@ -80,8 +52,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { Palette, Moon, Sun, Leaf, Wind, Snowflake, Mic, Send, Activity, Loader2 } from 'lucide-vue-next'
-import { getScenicSpots, updateSpotFlow } from '@/api/scenic'
+import { Palette, Moon, Sun, Leaf, Wind, Snowflake, Mic, Send } from 'lucide-vue-next'
 import { sendFayMessage } from '@/api/fay'
 import { getConfig, updateConfig } from '@/api/config'
 import { Message } from '@/utils/message'
@@ -140,42 +111,7 @@ const handleBroadcast = async () => {
   }
 }
 
-// ================== 客流模拟器 ==================
-const loadingSpots = ref(false)
-const spotList = ref([])
-
-const fetchSpotList = async () => {
-  loadingSpots.value = true
-  try {
-    const res = await getScenicSpots()
-    if (res && res.status === 'success') {
-      spotList.value = (res.data || []).map(spot => ({
-        ...spot,
-        temp_visitors: spot.current_visitors || 0
-      }))
-    }
-  } catch (error) {
-    console.error('获取景点列表失败:', error)
-  } finally {
-    loadingSpots.value = false
-  }
-}
-
-const applyFlow = async (spot) => {
-  try {
-    const res = await updateSpotFlow(spot.id, spot.temp_visitors)
-    if (res && res.status === 'success') {
-      Message.success(`${spot.spot_name} 客流更新成功`)
-    } else {
-      Message.error('客流更新失败')
-    }
-  } catch (error) {
-    Message.error('网络异常，客流更新失败')
-  }
-}
-
 onMounted(() => {
   fetchThemeConfig()
-  fetchSpotList()
 })
 </script>
