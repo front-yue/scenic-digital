@@ -1,5 +1,42 @@
 <template>
-  <div class="h-screen w-screen bg-[#021114] flex flex-col overflow-hidden">
+  <!-- 密码验证遮罩 -->
+  <div v-if="!isVerified" class="fixed inset-0 z-50 bg-[#020b14]/95 backdrop-blur-md flex items-center justify-center">
+    <div class="w-[340px] bg-[#061226]/90 border border-emerald-500/40 rounded-xl p-8 shadow-[0_0_40px_rgba(52,211,153,0.1)]">
+      <div class="flex flex-col items-center gap-5">
+        <div class="w-14 h-14 rounded-full border border-emerald-400/40 bg-emerald-500/10 flex items-center justify-center">
+          <Lock class="w-6 h-6 text-emerald-400" />
+        </div>
+        <div class="text-center">
+          <h3 class="text-lg font-bold text-white tracking-wider mb-1">管理后台</h3>
+          <p class="text-xs text-emerald-400/60 font-mono tracking-widest">ACCESS REQUIRED</p>
+        </div>
+        <div class="w-full">
+          <input
+            v-model="password"
+            @keyup.enter="handleVerify"
+            type="password"
+            placeholder="请输入访问密码"
+            class="w-full h-11 bg-white/5 border border-emerald-500/30 rounded-lg px-4 text-sm text-white/90 tracking-wider placeholder-emerald-100/25 focus:outline-none focus:border-emerald-400/60 focus:bg-white/8 transition-all"
+            autofocus
+          />
+          <p v-if="errorMsg" class="mt-2 text-xs text-red-400/80 text-center">{{ errorMsg }}</p>
+        </div>
+        <button
+          @click="handleVerify"
+          :disabled="!password.trim() || verifying"
+          class="w-full h-10 rounded-lg bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 text-sm font-bold tracking-widest hover:bg-emerald-500/30 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+        >
+          {{ verifying ? '验证中...' : '进入管理' }}
+        </button>
+        <button @click="router.push('/')" class="text-xs text-emerald-500/40 hover:text-emerald-400/70 transition-colors">
+          ← 返回首页
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 管理后台主体 -->
+  <div v-else class="h-screen w-screen bg-[#021114] flex flex-col overflow-hidden">
     <!-- 顶部标题栏 -->
     <header class="h-12 md:h-16 border-b border-emerald-500/30 flex items-center justify-between px-3 md:px-6 bg-gradient-to-r from-emerald-900/40 to-transparent shrink-0">
       <div class="flex items-center gap-2 md:gap-3">
@@ -66,8 +103,10 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { Database, Map, MapPin, Settings, ArrowLeft } from 'lucide-vue-next'
+import { Database, Map, MapPin, Settings, ArrowLeft, Lock } from 'lucide-vue-next'
+import { scenicRequest } from '@/utils/request'
 
 const router = useRouter()
 
@@ -80,6 +119,37 @@ const menuItems = [
 const goBack = () => {
   router.push('/')
 }
+
+// ========== 密码验证 ==========
+const isVerified = ref(false)
+const password = ref('')
+const verifying = ref(false)
+const errorMsg = ref('')
+
+const handleVerify = async () => {
+  if (!password.value.trim() || verifying.value) return
+  verifying.value = true
+  errorMsg.value = ''
+  try {
+    const res = await scenicRequest.post('/api/admin/verify', { password: password.value })
+    if (res && res.code === 200) {
+      sessionStorage.setItem('admin_verified', 'true')
+      isVerified.value = true
+    } else {
+      errorMsg.value = res?.message || '验证失败'
+    }
+  } catch (err) {
+    errorMsg.value = err?.response?.data?.message || '密码错误'
+  } finally {
+    verifying.value = false
+  }
+}
+
+onMounted(() => {
+  if (sessionStorage.getItem('admin_verified') == 'true') {
+    isVerified.value = true
+  }
+})
 </script>
 
 <style scoped>

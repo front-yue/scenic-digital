@@ -92,12 +92,53 @@
             <!-- 数字人模型占位区 -->
             <div class="relative z-20 h-[80%] w-full flex flex-col items-center justify-end">
               <div id="sdk" class="w-[342px] h-[100%] scale-110 origin-bottom flex flex-col items-center justify-center mix-blend-screen relative animate-float z-30 pointer-events-auto">
-                <template v-if="!avatarStore.isReady">
-                  <UserIcon class="w-32 h-32 mb-4 opacity-70 filter drop-shadow-[0_0_15px_#00f0ff] text-cyan-300/50" />
-                  <span class="font-mono font-bold tracking-[0.3em] text-lg text-shadow-glow text-cyan-300/50">
-                    {{ avatarStore.isXmovRunning ? '3D AVATAR LOADING...' : '数字向导尚未唤醒' }}
-                  </span>
+
+                <!-- ========== 加载中状态 ========== -->
+                <template v-if="!avatarStore.isReady && avatarStore.isXmovRunning">
+                  <div class="relative flex flex-col items-center">
+                    <!-- 旋转扫描环 -->
+                    <div class="relative w-28 h-28 mb-6">
+                      <div class="absolute inset-0 rounded-full border-2 border-cyan-500/10"></div>
+                      <div class="absolute inset-0 rounded-full border-2 border-transparent border-t-cyan-400 border-r-cyan-400/50 animate-spin-slow"></div>
+                      <div class="absolute inset-2 rounded-full border border-transparent border-b-emerald-400/60 border-l-emerald-400/30 animate-spin-reverse"></div>
+                      <!-- 中心图标 -->
+                      <div class="absolute inset-0 flex items-center justify-center">
+                        <UserIcon class="w-12 h-12 text-cyan-300/60 animate-pulse" />
+                      </div>
+                    </div>
+                    <!-- 文字提示 -->
+                    <span class="font-mono font-bold tracking-[0.3em] text-sm text-cyan-300/70 mb-3">3D AVATAR LOADING</span>
+                    <!-- 加载动画点 -->
+                    <div class="flex gap-1.5">
+                      <div class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce" style="animation-delay: 0s;"></div>
+                      <div class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce" style="animation-delay: 0.15s;"></div>
+                      <div class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce" style="animation-delay: 0.3s;"></div>
+                    </div>
+                  </div>
                 </template>
+
+                <!-- ========== 未唤醒状态 ========== -->
+                <template v-else-if="!avatarStore.isReady">
+                  <div class="relative flex flex-col items-center cursor-pointer group" @click="handleToggleXmov">
+                    <!-- 外圈呼吸光环 -->
+                    <div class="relative w-36 h-36 mb-6">
+                      <div class="absolute inset-0 rounded-full bg-cyan-400/5 animate-breathe"></div>
+                      <div class="absolute inset-3 rounded-full border border-cyan-500/20 animate-breathe" style="animation-delay: 0.5s;"></div>
+                      <div class="absolute inset-6 rounded-full border border-cyan-400/10"></div>
+                      <!-- 中心图标 -->
+                      <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="flex flex-col items-center gap-1">
+                          <UserIcon class="w-14 h-14 text-cyan-300/40 group-hover:text-cyan-300/70 transition-colors duration-500" />
+                          <div class="w-8 h-[2px] bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent group-hover:via-cyan-400/80 transition-colors"></div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- 文字提示 -->
+                    <span class="font-mono font-bold tracking-[0.2em] text-sm text-cyan-300/40 group-hover:text-cyan-300/70 transition-colors duration-500 mb-2">数字向导待命中</span>
+                    <span class="text-[10px] font-mono tracking-[0.15em] text-cyan-500/30 group-hover:text-cyan-400/60 transition-colors duration-500">CLICK TO ACTIVATE</span>
+                  </div>
+                </template>
+
               </div>
             </div>
 
@@ -477,5 +518,28 @@ onMounted(() => {
 .mode-switch-leave-active { transition: opacity 0.25s ease, transform 0.25s ease; }
 .mode-switch-enter-from { opacity: 0; transform: scale(0.97); }
 .mode-switch-leave-to { opacity: 0; transform: scale(0.97); }
+
+/* 数字人占位区动画 */
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes spin-reverse {
+  from { transform: rotate(360deg); }
+  to   { transform: rotate(0deg); }
+}
+@keyframes breathe {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50%      { opacity: 0.8; transform: scale(1.06); }
+}
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
+}
+.animate-spin-reverse {
+  animation: spin-reverse 2s linear infinite;
+}
+.animate-breathe {
+  animation: breathe 3s ease-in-out infinite;
+}
 
 </style>

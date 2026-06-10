@@ -39,3 +39,6 @@ class Config:
 
     # 高德地图配置
     AMAP_KEY = os.getenv('AMAP_KEY', '')
+
+    # 管理后台访问密码
+    ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD') or 'admin123'

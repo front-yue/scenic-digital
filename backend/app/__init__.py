@@ -1,4 +1,4 @@
-from flask import Flask, send_from_directory
+from flask import Flask, send_from_directory, request
 from flask_cors import CORS
 from config import Config
 from app.utils.response import ApiResponse
@@ -26,6 +26,15 @@ def create_app(config_class=Config):
     @app.route('/')
     def index():
         return ApiResponse.success(message="智慧文旅后端服务已启动 🚀")
+
+    # 管理后台密码验证接口
+    @app.route('/api/admin/verify', methods=['POST'])
+    def verify_admin():
+        data = request.get_json() or {}
+        password = data.get('password', '')
+        if password == app.config.get('ADMIN_PASSWORD'):
+            return ApiResponse.success(message="验证通过")
+        return ApiResponse.error(message="密码错误", code=401)
 
     # 注册蓝图 (路由)
     from app.routes.scenic_info_routes import scenic_info_bp
