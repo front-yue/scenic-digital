@@ -43,7 +43,7 @@
             <div class="flex items-center justify-between bg-cyan-950/30 p-4 rounded-lg border border-cyan-800/50">
               <div class="flex flex-col">
                 <span class="text-sm text-cyan-500/80 mb-1">当前版本</span>
-                <span class="text-2xl font-black text-white tracking-wider font-mono">v2.1.0<span class="text-cyan-400 text-sm ml-2 font-normal">智游版</span></span>
+                <span class="text-2xl font-black text-white tracking-wider font-mono">v{{ appVersion }}<span class="text-cyan-400 text-sm ml-2 font-normal">智游版</span></span>
               </div>
               <div class="w-12 h-12 rounded-full border-2 border-dashed border-cyan-500/50 flex items-center justify-center animate-[spin_10s_linear_infinite]">
                 <div class="w-8 h-8 bg-cyan-500/20 rounded-full flex items-center justify-center">
@@ -60,16 +60,16 @@
               </div>
               <ul class="space-y-2 text-sm text-gray-300 ml-6">
                 <li class="relative before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:bg-cyan-500 before:rounded-full before:-ml-4">
-                  <strong class="text-cyan-100">MCP 引擎升级：</strong>实现动态场景地理位置感知，路线规划更智能。
+                  <strong class="text-cyan-100">智能对话记录：</strong>右侧面板实时展示用户提问与 AI 回复，支持语音识别与文字输入双通道。
                 </li>
                 <li class="relative before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:bg-cyan-500 before:rounded-full before:-ml-4">
-                  <strong class="text-cyan-100">高德雷达系统：</strong>新增拖拽/缩放全息弹窗，接入步行导航与单点雷达双模式。
+                  <strong class="text-cyan-100">路线推荐数据化：</strong>推荐游览路线从数据库动态读取（JSON 格式），支持多条路线与多景点配置。
                 </li>
                 <li class="relative before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:bg-cyan-500 before:rounded-full before:-ml-4">
-                  <strong class="text-cyan-100">赛博视觉重构：</strong>全站适配极夜蓝风格，重写 AdminOverlay 控制台与 Driver.js 引导。
+                  <strong class="text-cyan-100">管理后台增强：</strong>新增路线可视化编辑器，支持增删路线/景点，预留 AI 智能生成路线接口。
                 </li>
                 <li class="relative before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:bg-cyan-500 before:rounded-full before:-ml-4">
-                  <strong class="text-cyan-100">全新演示数据：</strong>内置杭州西湖风景名胜区高精度 Mock 数据。
+                  <strong class="text-cyan-100">安全与交互优化：</strong>管理后台密码验证保护、AI 穿越照相馆入口整合、对话自动滚动到底部。
                 </li>
               </ul>
             </div>
@@ -81,8 +81,8 @@
                 <h4 class="font-bold tracking-wider text-sm">运行注意事项</h4>
               </div>
               <ul class="text-xs text-amber-200/70 space-y-1.5 ml-6 list-disc">
-                <li>由于浏览器安全策略，Fay 数字人语音收音需允许【麦克风】权限。</li>
-                <li>地图模块依赖高德 JS API 及 Web 服务 API，请确保 <code>.env</code> 密钥有效。</li>
+                <li>首次升级需执行 SQL 迁移：为 <code>scenic_info</code> 表新增 <code>recommended_routes</code> TEXT 字段。</li>
+                <li>管理后台已启用密码保护，默认密码配置在 <code>backend/.env</code> 的 <code>ADMIN_PASSWORD</code> 字段。</li>
                 <li>若 MCP 导航失败，请检查 Python 后端服务 (端口 8888) 是否正常运行。</li>
               </ul>
             </div>
@@ -105,17 +105,33 @@
 
 <script setup>
 import { X, Info, AlertTriangle, CheckCircle2 } from 'lucide-vue-next'
+import { onMounted } from 'vue'
+
+const STORAGE_KEY = 'scenic_version_seen'
 
 const props = defineProps({
   visible: {
     type: Boolean,
     default: false
+  },
+  appVersion: {
+    type: String,
+    default: '2.2.1'
   }
 })
 
 const emit = defineEmits(['update:visible'])
 
+// 首次访问或版本更新时自动弹出
+onMounted(() => {
+  const seenVersion = localStorage.getItem(STORAGE_KEY)
+  if (seenVersion !== props.appVersion) {
+    emit('update:visible', true)
+  }
+})
+
 const close = () => {
+  localStorage.setItem(STORAGE_KEY, props.appVersion)
   emit('update:visible', false)
 }
 </script>
