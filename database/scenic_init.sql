@@ -38,12 +38,13 @@ CREATE TABLE IF NOT EXISTS `scenic_info` (
   `ticket_price` DECIMAL(10,2) DEFAULT 0.00 COMMENT '票价（￥）',
   `opening_hours` VARCHAR(50) DEFAULT NULL COMMENT '营业时间，如：08:00 - 18:00',
   `address` VARCHAR(255) DEFAULT NULL COMMENT '地理位置，详细地址',
+  `recommended_routes` TEXT DEFAULT NULL COMMENT '推荐路线(JSON格式)',
   `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='景区信息表';
 
 -- 插入默认数据
-INSERT INTO `scenic_info` (`scenic_name`, `scenic_en_name`, `cover_image`, `weather_temp`, `weather_desc`, `introduction`, `ticket_price`, `opening_hours`, `address`) VALUES 
-('杭州西湖风景名胜区', 'WEST LAKE SCENIC AREA', 'https://images.unsplash.com/photo-1541843943716-e41c48c6bb8a?auto=format&fit=crop&w=800&q=80', '26°C', '多云 | AQI 35', '杭州西湖风景名胜区位于浙江省杭州市中心，是首批国家重点风景名胜区，也是中国著名的旅游胜地。以“一山、二塔、三岛、三堤、五湖”的基本格局著称，西湖之美，美在晴中见潋滟，雨中显空蒙。\n\n作为世界文化遗产，西湖承载了丰富的历史与文化底蕴。无论是断桥残雪的凄美传说，还是苏堤春晓的盎然生机，每一处景点都诉说着千年的故事。漫步西湖畔，您可以感受“水光潋滟晴方好，山色空蒙雨亦奇”的绝佳意境。\n\n近年来，西湖景区全面推进智慧文旅建设，将数字导览、实时客流监控、AI数字人服务融入游客体验。在雷峰塔下、岳王庙前，您可以通过我们的系统实时了解景点历史，获取最佳游览路线推荐。\n\n环保与可持续发展是西湖景区的核心理念。我们倡导绿色出行，环湖提供纯电动接驳车及公共自行车服务，努力保持西湖水清、岸绿、景美的生态画卷。欢迎每一位游客在这个人间天堂，开启一段难忘的江南之旅。', 0.00, '全天开放', '浙江省杭州市西湖区西湖风景名胜区');
+INSERT INTO `scenic_info` (`scenic_name`, `scenic_en_name`, `cover_image`, `weather_temp`, `weather_desc`, `introduction`, `ticket_price`, `opening_hours`, `address`, `recommended_routes`) VALUES 
+('杭州西湖风景名胜区', 'WEST LAKE SCENIC AREA', 'https://images.unsplash.com/photo-1541843943716-e41c48c6bb8a?auto=format&fit=crop&w=800&q=80', '26°C', '多云 | AQI 35', '杭州西湖风景名胜区位于浙江省杭州市中心，是首批国家重点风景名胜区，也是中国著名的旅游胜地。以“一山、二塔、三岛、三堤、五湖”的基本格局著称，西湖之美，美在晴中见潋滟，雨中显空蒙。\n\n作为世界文化遗产，西湖承载了丰富的历史与文化底蕴。无论是断桥残雪的凄美传说，还是苏堤春晓的盎然生机，每一处景点都诉说着千年的故事。漫步西湖畔，您可以感受“水光潋滟晴方好，山色空蒙雨亦奇”的绝佳意境。\n\n近年来，西湖景区全面推进智慧文旅建设，将数字导览、实时客流监控、AI数字人服务融入游客体验。在雷峰塔下、岳王庙前，您可以通过我们的系统实时了解景点历史，获取最佳游览路线推荐。\n\n环保与可持续发展是西湖景区的核心理念。我们倡导绿色出行，环湖提供纯电动接驳车及公共自行车服务，努力保持西湖水清、岸绿、景美的生态画卷。欢迎每一位游客在这个人间天堂，开启一段难忘的江南之旅。', 0.00, '全天开放', '浙江省杭州市西湖区西湖风景名胜区', '[{"label":"\u7ecf\u5178\u7ebf","duration":"\u7ea6 3 \u5c0f\u65f6","spots":["\u65ad\u6865\u6b8b\u96ea","\u767d\u5824","\u5b64\u5c71","\u82cf\u5824\u6625\u6653","\u96f7\u5cf0\u5854"]},{"label":"\u6587\u5316\u7ebf","duration":"\u7ea6 2 \u5c0f\u65f6","spots":["\u5cb3\u738b\u5e99","\u897f\u51b7\u5370\u793e","\u66f2\u9662\u98ce\u8377","\u4e09\u6f6d\u5370\u6708"]}]');
 
 
 

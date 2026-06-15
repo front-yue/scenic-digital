@@ -11,6 +11,15 @@ export const useAvatarStore = defineStore('avatar', () => {
   const renderState = ref('')
   const isXmovRunning = ref(false)
 
+  // 对话记录（全局共享）
+  const chatMessages = ref([]) // { role: 'user' | 'ai', content: string }
+
+  const addChatMessage = (role, content) => {
+    if (!content) return
+    chatMessages.value.push({ role, content })
+    if (chatMessages.value.length > 30) chatMessages.value = chatMessages.value.slice(-30)
+  }
+
   const initSDK = async () => {
     if (typeof window.XmovAvatar === 'undefined') {
       Message.error('XmovAvatar SDK 未加载，请检查 index.html')
@@ -105,6 +114,8 @@ export const useAvatarStore = defineStore('avatar', () => {
     voiceStatus,
     renderState,
     isXmovRunning,
+    chatMessages,
+    addChatMessage,
     initSDK,
     speak,
     destroySDK

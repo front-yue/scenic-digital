@@ -87,7 +87,7 @@
     </div>
 
     <!-- 卡片 4：推荐游览路线 -->
-    <div class="tech-card p-5 flex flex-col gap-3 relative border-emerald-500/20 bg-[#021815]/60 shrink-0 overflow-hidden">
+    <div v-if="routes.length" class="tech-card p-5 flex flex-col gap-3 relative border-emerald-500/20 bg-[#021815]/60 shrink-0 overflow-hidden">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
           <div class="w-2 h-4 bg-emerald-400"></div>
@@ -96,28 +96,14 @@
         <Compass class="w-4 h-4 text-emerald-400/60" />
       </div>
 
-      <!-- 路线 1：经典一日游 -->
-      <div class="flex flex-col gap-2">
+      <div v-for="(route, ri) in routes" :key="ri" class="flex flex-col gap-2">
         <div class="flex items-center gap-2">
-          <div class="px-2 py-0.5 rounded border border-emerald-400/40 bg-emerald-400/10 text-[10px] text-emerald-300 font-bold">经典线</div>
-          <span class="text-[10px] text-emerald-100/50 font-mono">约 3 小时</span>
+          <div class="px-2 py-0.5 rounded border text-[10px] font-bold" :class="ri % 2 === 0 ? 'border-emerald-400/40 bg-emerald-400/10 text-emerald-300' : 'border-teal-400/40 bg-teal-400/10 text-teal-300'">{{ route.label }}</div>
+          <span class="text-[10px] text-emerald-100/50 font-mono">{{ route.duration }}</span>
         </div>
         <div class="flex items-center gap-1 flex-wrap">
-          <span v-for="(spot, i) in routeClassic" :key="'c' + i" class="text-xs text-emerald-100/80">
-            {{ spot }}<span v-if="i < routeClassic.length - 1" class="text-emerald-500/40 mx-1">→</span>
-          </span>
-        </div>
-      </div>
-
-      <!-- 路线 2：文化深度游 -->
-      <div class="flex flex-col gap-2">
-        <div class="flex items-center gap-2">
-          <div class="px-2 py-0.5 rounded border border-teal-400/40 bg-teal-400/10 text-[10px] text-teal-300 font-bold">文化线</div>
-          <span class="text-[10px] text-emerald-100/50 font-mono">约 2 小时</span>
-        </div>
-        <div class="flex items-center gap-1 flex-wrap">
-          <span v-for="(spot, i) in routeCulture" :key="'w' + i" class="text-xs text-emerald-100/80">
-            {{ spot }}<span v-if="i < routeCulture.length - 1" class="text-emerald-500/40 mx-1">→</span>
+          <span v-for="(spot, si) in route.spots" :key="si" class="text-xs text-emerald-100/80">
+            {{ spot }}<span v-if="si < route.spots.length - 1" class="text-emerald-500/40 mx-1">→</span>
           </span>
         </div>
       </div>
@@ -131,15 +117,17 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { Sun, Ticket, Clock as ClockIcon, MapPin, Compass } from 'lucide-vue-next'
 import { useScenicStore } from '../../stores/scenic'
 
 const store = useScenicStore()
 
 // 推荐路线数据
-const routeClassic = ['断桥残雪', '白堤', '孤山', '苏堤春晓', '雷峰塔']
-const routeCulture = ['岳王庙', '西泠印社', '曲院风荷', '三潭印月']
+const routes = computed(() => {
+  const r = store.scenicInfo.recommended_routes
+  return Array.isArray(r) ? r : []
+})
 
 // 自动滚动逻辑
 const introScrollContainer = ref(null);

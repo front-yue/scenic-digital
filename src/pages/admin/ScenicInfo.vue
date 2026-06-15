@@ -77,6 +77,62 @@
             <label class="text-sm text-emerald-100/70">景区详细介绍</label>
             <textarea v-model="form.introduction" rows="8" class="bg-emerald-900/20 border border-emerald-500/30 rounded px-4 py-2 text-emerald-100 focus:outline-none focus:border-emerald-400 focus:bg-emerald-900/40 transition-colors resize-none custom-scrollbar"></textarea>
           </div>
+
+          <!-- 推荐路线编辑区 -->
+          <div class="flex flex-col gap-3">
+            <div class="flex items-center justify-between">
+              <label class="text-sm text-emerald-100/70">推荐游览路线</label>
+              <div class="flex items-center gap-2">
+                <button @click="addRoute" class="px-3 py-1 text-xs bg-emerald-500/20 border border-emerald-500/30 rounded text-emerald-300 hover:bg-emerald-500/30 transition-colors flex items-center gap-1.5">
+                  <Plus class="w-3.5 h-3.5" /> 添加路线
+                </button>
+                <button @click="handleAIGenerate" class="p-1.5 rounded border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/25 hover:border-emerald-400/50 transition-all" title="AI 智能生成路线">
+                  <Sparkles class="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            <div v-for="(route, ri) in form.recommended_routes" :key="ri" class="bg-emerald-900/15 border border-emerald-500/20 rounded-lg p-4 flex flex-col gap-3">
+              <div class="flex items-center gap-3">
+                <div class="flex-1 flex flex-col gap-2">
+                  <input v-model="route.label" type="text" placeholder="路线名称（如：经典线）" class="w-full bg-emerald-900/30 border border-emerald-500/20 rounded px-3 py-1.5 text-sm text-emerald-100 focus:outline-none focus:border-emerald-400 transition-colors" />
+                </div>
+                <div class="w-32 flex flex-col gap-2">
+                  <input v-model="route.duration" type="text" placeholder="时长" class="w-full bg-emerald-900/30 border border-emerald-500/20 rounded px-3 py-1.5 text-sm text-emerald-100 focus:outline-none focus:border-emerald-400 transition-colors" />
+                </div>
+                <button @click="removeRoute(ri)" class="p-1.5 rounded border border-red-500/30 bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors shrink-0" title="删除路线">
+                  <Trash2 class="w-3.5 h-3.5" />
+                </button>
+              </div>
+              <!-- 景点列表 -->
+              <div class="flex flex-col gap-1.5">
+                <span class="text-[10px] text-emerald-400/60 font-mono tracking-widest">途径景点</span>
+                <div class="flex flex-wrap items-center gap-1.5">
+                  <span
+                    v-for="(spot, si) in route.spots" :key="si"
+                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-100/80 group/spot"
+                  >
+                    {{ spot }}
+                    <button @click="removeSpot(ri, si)" class="text-emerald-500/40 hover:text-red-400 transition-colors">×</button>
+                  </span>
+                  <div class="flex items-center gap-1">
+                    <input
+                      v-model="newSpotInputs[ri]"
+                      @keyup.enter="addSpot(ri)"
+                      type="text"
+                      placeholder="添加景点"
+                      class="w-20 h-6 bg-emerald-900/30 border border-emerald-500/15 rounded px-2 text-xs text-emerald-100 focus:outline-none focus:border-emerald-400 transition-colors"
+                    />
+                    <button @click="addSpot(ri)" class="w-6 h-6 flex items-center justify-center rounded bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25 transition-colors text-xs">+</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div v-if="!form.recommended_routes.length" class="text-center py-6 text-emerald-500/40 text-xs tracking-wider border border-dashed border-emerald-500/20 rounded-lg">
+              暂无推荐路线，点击“添加路线”或 ✨ AI 生成
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -85,7 +141,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { Save, Loader2, Upload } from 'lucide-vue-next'
+import { Save, Loader2, Upload, Plus, Trash2, Sparkles } from 'lucide-vue-next'
 import { getScenicInfo, updateScenicInfo, uploadImage } from '@/api/scenic'
 import { Message } from '@/utils/message'
 
@@ -99,8 +155,11 @@ const form = ref({
   cover_image: '',
   ticket_price: '',
   opening_hours: '',
-  introduction: ''
+  introduction: '',
+  recommended_routes: []
 })
+
+const newSpotInputs = ref({})
 
 const fetchData = async () => {
   loading.value = true
@@ -108,6 +167,9 @@ const fetchData = async () => {
     const res = await getScenicInfo()
     if (res && res.status === 'success' && res.data) {
       form.value = { ...res.data }
+      if (!Array.isArray(form.value.recommended_routes)) {
+        form.value.recommended_routes = []
+      }
     }
   } catch (error) {
     console.error('获取景区信息失败:', error)
@@ -163,4 +225,28 @@ const handleImageUpload = async (event) => {
 }
 
 onMounted(fetchData)
+
+// ========== 路线编辑 ==========
+const addRoute = () => {
+  form.value.recommended_routes.push({ label: '', duration: '', spots: [] })
+}
+
+const removeRoute = (index) => {
+  form.value.recommended_routes.splice(index, 1)
+}
+
+const addSpot = (routeIndex) => {
+  const text = (newSpotInputs.value[routeIndex] || '').trim()
+  if (!text) return
+  form.value.recommended_routes[routeIndex].spots.push(text)
+  newSpotInputs.value[routeIndex] = ''
+}
+
+const removeSpot = (routeIndex, spotIndex) => {
+  form.value.recommended_routes[routeIndex].spots.splice(spotIndex, 1)
+}
+
+const handleAIGenerate = () => {
+  Message.info('AI 生成路线功能即将上线，敬请期待')
+}
 </script>
