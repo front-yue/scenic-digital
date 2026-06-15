@@ -176,9 +176,9 @@
 
       <!-- 右侧 -->
       <div class="absolute z-40 right-4 top-1/2 -translate-y-1/2 flex flex-col gap-4">
-        <div id="guide-location-btn" class="relative group cursor-pointer" @click="showCurrentLocation" title="当前位置雷达">
+        <div class="relative group cursor-pointer" @click="scenicStore.isInteractMode = true" title="AI 穿越照相馆">
           <div class="tech-hex-btn transition-colors border-cyan-400/50 bg-cyan-400/10 hover:shadow-[0_0_15px_#00f0ff]">
-            <MapPinIcon class="w-5 h-5 text-cyan-300 group-hover:scale-110 transition-transform" />
+            <CameraIcon class="w-5 h-5 text-cyan-300 group-hover:scale-110 transition-transform" />
           </div>
         </div>
         <div id="guide-avatar-btn" class="relative group cursor-pointer" @click="handleToggleXmov" :title="avatarStore.isXmovRunning ? '关闭数字人' : '开启数字人'">
@@ -194,10 +194,10 @@
 <script setup>
 import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import {
-  User as UserIcon, Map as MapIcon, MapPin as MapPinIcon,
+  User as UserIcon, Map as MapIcon,
   Mic as MicIcon, MicOff as MicOffIcon,
   Power as PowerIcon, PowerOff as PowerOffIcon,
-  MonitorPlay as MonitorPlayIcon
+  MonitorPlay as MonitorPlayIcon, Camera as CameraIcon
 } from 'lucide-vue-next'
 import { useAvatarStore } from '@/stores/avatar'
 import { useScenicStore } from '@/stores/scenic'
@@ -409,9 +409,14 @@ watch(wsData, (newData) => {
   if (!newData) return
   try {
     const msg = JSON.parse(newData)
-    if (msg?.Data.Key == 'text') {
+    if (msg?.Data?.Key === 'human_text') {
+      // 用户语音识别文本
+      avatarStore.addChatMessage('user', msg.Data.Value)
+    } else if (msg?.Data?.Key === 'text') {
       message.value += msg.Data.Value
       if (msg.Data.IsEnd == 1) {
+        // 保存 AI 回复到对话记录
+        avatarStore.addChatMessage('ai', message.value)
         avatarStore.speak(message.value, true, true)
         const routeMatch = message.value.match(/从【(.*?)】到【(.*?)】/)
         message.value = ''
@@ -480,8 +485,7 @@ const initGuide = () => {
       steps: [
         { element: '#guide-fay-btn', popover: { title: '核心引擎', description: '点击这里启动或关闭 Fay 数字人 AI 引擎。', side: 'right', align: 'start' } },
         { element: '#guide-mic-btn', popover: { title: '语音输入', description: '控制麦克风收音，直接与数字向导对话。', side: 'right', align: 'start' } },
-        { element: '#guide-avatar-btn', popover: { title: '全息投影', description: '启动/关闭数字人的 3D 模型渲染。', side: 'left', align: 'start' } },
-        { element: '#guide-location-btn', popover: { title: '位置雷达', description: '在地图上精准定位当前景区位置。', side: 'left', align: 'start' } }
+        { element: '#guide-avatar-btn', popover: { title: '全息投影', description: '启动/关闭数字人的 3D 模型渲染。', side: 'left', align: 'start' } }
       ],
       onDestroyed: () => localStorage.setItem('scenic_digital_guide_shown', 'true')
     })

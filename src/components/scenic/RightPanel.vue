@@ -44,32 +44,31 @@
       </div>
     </div>
 
-    <!-- 底部操作按钮 -> 消息输入区与互动按钮 -->
-    <div class="mt-auto shrink-0 flex flex-col gap-3">
-       <!-- 互动体验区 -->
-       <div class="flex items-center gap-2 mb-1">
-          <div class="w-1.5 h-1.5 rotate-45" style="background-color: var(--app-primary); box-shadow: 0 0 8px var(--app-primary);"></div>
-          <span class="text-xs font-bold tracking-widest" style="color: var(--app-primary);">互动体验</span>
+    <!-- 底部操作区 -->
+    <div class="mt-auto shrink-0 flex flex-col gap-2">
+       <!-- 对话记录（输入框上方） -->
+       <div ref="chatListRef" v-if="avatarStore.chatMessages.length" class="max-h-[200px] overflow-y-auto custom-scrollbar pr-1">
+         <TransitionGroup name="chat-msg" tag="div" class="flex flex-col gap-1.5">
+           <div
+             v-for="(msg, i) in avatarStore.chatMessages.slice(-8)"
+             :key="msg.role + '-' + i"
+             class="flex items-start gap-1.5"
+             :class="msg.role === 'user' ? 'justify-end' : 'justify-start'"
+           >
+             <span v-if="msg.role === 'ai'" class="shrink-0 mt-1 w-1 h-1 rounded-full bg-emerald-400 shadow-[0_0_3px_#34d399]"></span>
+             <p
+               class="text-[11px] leading-relaxed max-w-[88%] px-2.5 py-1.5 rounded-lg"
+               :class="msg.role === 'user'
+                 ? 'bg-emerald-500/15 text-emerald-100/90 border border-emerald-500/25'
+                 : 'bg-black/20 text-emerald-200/70 border border-emerald-500/10'"
+             >{{ msg.content }}</p>
+             <span v-if="msg.role === 'user'" class="shrink-0 mt-1 w-1 h-1 rounded-full bg-emerald-300/60"></span>
+           </div>
+         </TransitionGroup>
        </div>
-       <button
-          @click="store.isInteractMode = true"
-          class="w-full relative group/btn overflow-hidden rounded-lg border bg-black/30 p-3 transition-all duration-300 hover-border-primary"
-          style="border-color: rgba(var(--app-primary-rgb), 0.3);"
-       >
-          <div class="absolute inset-0 bg-gradient-to-r from-transparent via-[rgba(var(--app-primary-rgb),0.1)] to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700"></div>
-          <div class="flex items-center gap-3">
-             <div class="w-10 h-10 rounded bg-black/50 border flex items-center justify-center group-hover/btn:scale-110 transition-transform" style="border-color: rgba(var(--app-primary-rgb), 0.5);">
-                <Camera class="w-5 h-5" style="color: var(--app-primary);" />
-             </div>
-             <div class="text-left">
-                <h3 class="font-bold text-sm" style="color: var(--app-text);">AI 穿越照相馆</h3>
-                <p class="text-[10px] mt-0.5 opacity-70" style="color: var(--app-primary);">一键生成景区实景融合海报</p>
-             </div>
-          </div>
-       </button>
 
        <!-- 消息输入区 -->
-       <div class="h-12 w-full flex relative group mt-1">
+       <div class="h-11 w-full flex relative group">
          <input
             v-model="chatMessage"
             @keyup.enter="handleSendMessage"
@@ -91,8 +90,8 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { Send, Camera, MapPin } from 'lucide-vue-next'
+import { ref, watch, nextTick } from 'vue'
+import { Send, MapPin } from 'lucide-vue-next'
 import { useScenicStore } from '@/stores/scenic'
 import { useAvatarStore } from '@/stores/avatar'
 import { sendFayMessage } from '@/api/fay'
@@ -100,6 +99,16 @@ import { Message } from '@/utils/message'
 
 const store = useScenicStore()
 const avatarStore = useAvatarStore()
+
+// 自动滚动到底部
+const chatListRef = ref(null)
+watch(() => avatarStore.chatMessages.length, () => {
+  nextTick(() => {
+    if (chatListRef.value) {
+      chatListRef.value.scrollTop = chatListRef.value.scrollHeight
+    }
+  })
+})
 
 const emit = defineEmits(['locate-spot'])
 
@@ -122,11 +131,13 @@ const handleLocateSpot = (spot, index) => {
 
 const handleSendMessage = async () => {
   if (!chatMessage.value.trim() || isSending.value) return
+  const text = chatMessage.value.trim()
 
   isSending.value = true
   try {
-    const res = await sendFayMessage(chatMessage.value)
+    const res = await sendFayMessage(text)
     if (res && res.result === 'successful') {
+      avatarStore.addChatMessage('user', text)
       Message.success('消息发送成功')
       chatMessage.value = ''
     } else {
@@ -142,7 +153,10 @@ const handleSendMessage = async () => {
 </script>
 
 <style scoped>
-.hover-border-primary:hover {
-  border-color: var(--app-primary) !important;
-}
+/* 对话消息动画 */
+.chat-msg-enter-active { transition: all 0.3s ease-out; }
+.chat-msg-leave-active { transition: all 0.2s ease-in; }
+.chat-msg-enter-from { opacity: 0; transform: translateY(6px); }
+.chat-msg-leave-to { opacity: 0; transform: translateY(-4px); }
+.chat-msg-move { transition: transform 0.3s ease; }
 </style>
