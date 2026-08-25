@@ -1,417 +1,338 @@
- <template>
-  <div class="h-screen w-full font-sans relative overflow-hidden tech-bg flex flex-col" style="background-color: var(--app-bg); color: var(--app-text);">
-    
-    <!-- 全局 Canvas 粒子背景 -->
-    <canvas ref="particleCanvas" class="absolute inset-0 z-0 opacity-60"></canvas>
+<template>
+  <div class="scenic-screen">
+    <!-- 景区实景背景 -->
+    <div
+      class="scenic-bg"
+      :style="{ backgroundImage: scenicBgUrl ? `url(${scenicBgUrl})` : '' }"
+    ></div>
+    <div class="scenic-overlay"></div>
 
-    <!-- 全局背景光晕与网格特效 -->
-    <div class="absolute inset-0 pointer-events-none z-0">
-      <div class="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[80%] h-[600px] blur-[150px] rounded-[100%]" style="background-color: var(--app-glow-1);"></div>
-      <div class="absolute bottom-[-10%] left-1/2 -translate-x-1/2 w-[100%] h-[400px] blur-[150px] rounded-[100%]" style="background-color: var(--app-glow-2);"></div>
+    <!-- 粒子层 -->
+    <ParticleLayer class="particle-layer" />
+
+    <!-- 顶部装饰 -->
+    <div class="top-decor">
+      <div class="scan-line primary"></div>
+      <div class="scan-line secondary"></div>
     </div>
 
-    <!-- ================= 顶部标题栏 ================= -->
-    <header class="w-full flex items-start justify-center relative z-20 shrink-0 h-[100px]">
-      <div class="relative w-full h-full max-w-[1920px] flex justify-between items-start">
-        
-        <div class="relative w-[30%] h-full">
-           <div class="absolute top-0 left-0 w-full h-[60px] bg-gradient-to-r from-[#00f0ff]/10 to-transparent skew-x-[-30deg] origin-top border-b border-cyan-500/30"></div>
-           <div class="absolute top-0 left-0 w-full h-full flex flex-col items-start justify-center px-8">
-              <div class="flex items-center gap-3 text-cyan-300">
-                <ClockIcon class="w-5 h-5 animate-pulse" />
-                <span class="text-xl md:text-2xl font-mono font-bold tracking-wider text-shadow-glow">{{ currentTime }}</span>
-              </div>
-              <span class="text-sm text-cyan-500/80 tracking-widest font-mono mt-1 ml-8">{{ currentDate }}</span>
-           </div>
-        </div>
+    <!-- 顶部导航 -->
+    <TopNavBar
+      title="智慧文旅 · 数字人"
+      subtitle="SCENIC DIGITAL"
+      :logo="logoUrl"
+      :menu-items="menuItems"
+      :active-key="activeMenu"
+      :weather="weatherInfo"
+      @menu-click="activeMenu = $event"
+      @open-config="openConfig"
+      @go-admin="goAdmin"
+    />
 
-        <div class="relative flex flex-col justify-start items-center w-[40%] h-full pt-4">
-          <div class="relative w-full max-w-[600px] h-[50px] flex items-center justify-center">
-            <div class="absolute inset-0 bg-[#061226]/90 backdrop-blur-md border-x-2 border-cyan-400 shadow-[0_0_30px_rgba(0,240,255,0.15)]" style="clip-path: polygon(5% 0, 95% 0, 100% 50%, 95% 100%, 5% 100%, 0% 50%);"></div>
-            
-            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-[2px] bg-gradient-to-r from-transparent via-cyan-300 to-transparent"></div>
-            <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-[80%] h-[2px] bg-gradient-to-r from-transparent via-cyan-300 to-transparent"></div>
+    <!-- 主内容区 -->
+    <main class="main-layout">
+      <!-- 左侧：数字人 -->
+      <section class="avatar-section" :class="{ 'chat-active': activeMenu === 'chat' }">
+        <AvatarPanel />
+      </section>
 
-            <h1 class="relative text-2xl md:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-emerald-300 tracking-[0.2em] z-10 filter drop-shadow-[0_0_12px_rgba(52,211,153,0.8)]">
-              智慧文旅数字人体验平台
-            </h1>
-            
-            <div class="absolute left-6 w-2 h-2 bg-cyan-400 rotate-45 shadow-[0_0_8px_#00f0ff] animate-pulse"></div>
-            <div class="absolute right-6 w-2 h-2 bg-cyan-400 rotate-45 shadow-[0_0_8px_#00f0ff] animate-pulse"></div>
-          </div>
-
-          <div class="relative w-full max-w-[400px] h-[20px] mt-2 flex justify-center items-center gap-4 opacity-70">
-            <div class="flex-1 h-[1px] bg-cyan-500/50 relative">
-               <div class="absolute right-0 top-1/2 -translate-y-1/2 w-16 h-[3px] bg-cyan-400"></div>
-            </div>
-            <div class="cursor-pointer group" @click="versionVisible = true">
-              <div class="flex items-center gap-1.5 px-3 py-1 rounded-full border border-cyan-500/30 bg-cyan-900/20 backdrop-blur-md group-hover:bg-cyan-500/20 transition-all shadow-[0_0_10px_rgba(0,240,255,0.08)] group-hover:shadow-[0_0_15px_rgba(0,240,255,0.25)]">
-                <div class="w-1.5 h-1.5 bg-cyan-400 rotate-45 shadow-[0_0_8px_#00f0ff]"></div>
-                <span class="text-xs text-cyan-400/80 tracking-[0.2em] font-mono group-hover:text-cyan-300">SYS KERNEL V3.0</span>
-                <div class="w-1.5 h-1.5 bg-cyan-400 rotate-45 shadow-[0_0_8px_#00f0ff]"></div>
-              </div>
-            </div>
-            <div class="flex-1 h-[1px] bg-cyan-500/50 relative">
-               <div class="absolute left-0 top-1/2 -translate-y-1/2 w-16 h-[3px] bg-cyan-400"></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="relative w-[30%] h-[60px]">
-           <div class="absolute top-0 right-0 w-full h-[60px] bg-gradient-to-l from-[#00f0ff]/10 to-transparent skew-x-[30deg] origin-top border-b border-cyan-500/30"></div>
-           <div class="absolute top-0 right-0 w-full h-full flex flex-col items-end justify-center px-8">
-              <div class="flex items-center gap-3">
-                <div class="cursor-pointer group" @click="configVisible = true">
-                  <div class="flex items-center gap-2 px-4 py-1.5 rounded-full border border-cyan-500/30 bg-cyan-900/20 backdrop-blur-md group-hover:bg-cyan-500/20 transition-all shadow-[0_0_15px_rgba(0,240,255,0.1)] group-hover:shadow-[0_0_20px_rgba(0,240,255,0.3)]">
-                    <SettingsIcon class="w-4 h-4 text-cyan-300 group-hover:text-white" />
-                    <span class="text-sm font-bold text-cyan-300 tracking-widest group-hover:text-white">配置</span>
-                  </div>
-                </div>
-                <div class="cursor-pointer group" @click="router.push('/admin')">
-                  <div class="flex items-center gap-2 px-4 py-1.5 rounded-full border border-cyan-500/30 bg-cyan-900/20 backdrop-blur-md group-hover:bg-cyan-500/20 transition-all shadow-[0_0_15px_rgba(0,240,255,0.1)] group-hover:shadow-[0_0_20px_rgba(0,240,255,0.3)]">
-                    <LayoutDashboardIcon class="w-4 h-4 text-cyan-300 group-hover:text-white" />
-                    <span class="text-sm font-bold text-cyan-300 tracking-widest group-hover:text-white">管理后台</span>
-                  </div>
-                </div>
-              </div>
-           </div>
-        </div>
-      </div>
-    </header>
-
-    <!-- ================= 顶部弧形装饰线 ================= -->
-    <div class="absolute top-0 left-0 w-full h-[150px] pointer-events-none z-0 overflow-hidden flex justify-center">
-      <div class="w-[120%] h-[300px] border-b-[2px] border-cyan-500/50 rounded-[50%] absolute top-[-165px] shadow-[0_10px_20px_rgba(0,240,255,0.2)]"></div>
-      <div class="absolute top-[134px] w-[50%] max-w-[600px] h-[2px] bg-gradient-to-r from-transparent via-cyan-300 to-transparent shadow-[0_0_15px_#00f0ff]"></div>
-    </div>
-
-    <!-- ================= 底部弧形装饰线 ================= -->
-    <div class="absolute bottom-0 left-0 w-full h-[150px] pointer-events-none z-0 overflow-hidden flex justify-center">
-      <div class="w-[120%] h-[300px] border-t-[2px] border-cyan-500/50 rounded-[50%] absolute bottom-[-260px] shadow-[0_-10px_20px_rgba(0,240,255,0.2)]"></div>
-      <div class="absolute bottom-[39px] w-[50%] max-w-[600px] h-[2px] bg-gradient-to-r from-transparent via-cyan-300 to-transparent shadow-[0_0_15px_#00f0ff]"></div>
-    </div>
-
-    <!-- ================= 主体内容区 ================= -->
-    <main class="flex-1 w-full max-w-[1800px] mx-auto p-4 lg:p-6 flex flex-col lg:flex-row items-stretch gap-10 relative z-10 perspective-[1500px] min-h-0 pb-8 pt-4">
-      
-      <!-- 左侧面板：带平滑退场动画 -->
-      <transition name="panel-left">
-        <LeftPanel v-show="!store.isInteractMode" class="transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]" />
-      </transition>
-      
-      <CenterPanel ref="centerPanelRef" />
-
-      <!-- 右侧面板：带平滑退场动画 -->
-      <transition name="panel-right">
-        <RightPanel v-show="!store.isInteractMode" @locate-spot="handleLocateSpot" class="transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]" />
-      </transition>
-
+      <!-- 右侧：内容面板 -->
+      <section class="content-section">
+        <Transition name="panel" mode="out-in">
+          <component :is="currentPage" :key="activeMenu" />
+        </Transition>
+      </section>
     </main>
 
-    <!-- AI 照相馆弹窗组件 -->
-    <AIPhotoOverlay />
-
-    <!-- 版本信息弹窗 -->
-    <VersionModal  :visible="versionVisible"  @update:visible="versionVisible = $event"/>
-
-    <!-- 系统配置弹窗 -->
-    <ConfigPanel :visible="configVisible" @update:visible="configVisible = $event" />
+    <!-- 配置弹窗 -->
+    <ConfigPanel v-model:visible="showConfig" />
   </div>
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, ref } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { Clock as ClockIcon, LayoutDashboard as LayoutDashboardIcon, Settings as SettingsIcon } from 'lucide-vue-next'
-
-import LeftPanel from '@/components/scenic/LeftPanel.vue'
-import CenterPanel from '@/components/scenic/CenterPanel.vue'
-import RightPanel from '@/components/scenic/RightPanel.vue'
-import AIPhotoOverlay from '@/components/photo/AIPhotoOverlay.vue'
-import VersionModal from '@/components/common/VersionModal.vue'
-
 import { useScenicStore } from '@/stores/scenic'
-import ConfigPanel from '@/components/common/ConfigPanel.vue'
+import { useAvatarStore } from '@/stores/avatar'
+import { useFaySocket } from '@/composables/useFaySocket'
 import { getConfig } from '@/api/config'
+import TopNavBar from '@/components/scenic/TopNavBar.vue'
+import AvatarPanel from '@/components/scenic/AvatarPanel.vue'
+import OverviewPage from '@/components/scenic/OverviewPage.vue'
+import SpotsPage from '@/components/scenic/SpotsPage.vue'
+import RoutesPage from '@/components/scenic/RoutesPage.vue'
+import MapPage from '@/components/scenic/MapPage.vue'
+import ChatPage from '@/components/scenic/ChatPage.vue'
+import AnnouncementPage from '@/components/scenic/AnnouncementPage.vue'
+import ConfigPanel from '@/components/common/ConfigPanel.vue'
+import ParticleLayer from '@/components/common/ParticleLayer.vue'
+import {
+  LayoutDashboard,
+  Landmark,
+  Route,
+  Map,
+  MessageSquare,
+  Megaphone
+} from 'lucide-vue-next'
 
-const store = useScenicStore()
 const router = useRouter()
+const scenicStore = useScenicStore()
+const avatarStore = useAvatarStore()
+useFaySocket()
 
-// CenterPanel 引用 & 景点定位转发
-const centerPanelRef = ref(null)
-const handleLocateSpot = (payload) => {
-  if (centerPanelRef.value?.locateSpot) {
-    centerPanelRef.value.locateSpot(payload)
+const activeMenu = ref('overview')
+const showConfig = ref(false)
+
+const logoUrl = '/logo.png'
+
+// 天气：映射到 FAY 后端字段
+const weatherInfo = computed(() => {
+  const info = scenicStore.scenicInfo || {}
+  if (info.weather_desc && info.weather_temp) {
+    return {
+      temp: info.weather_temp,
+      text: info.weather_desc
+    }
   }
+  // 默认天气
+  return { temp: 26, text: '多云' }
+})
+
+const scenicBgUrl = computed(() => {
+  const info = scenicStore.scenicInfo || {}
+  // 优先使用景区封面图，其次取第一个景点图
+  if (info.cover_image) return info.cover_image
+  const firstSpot = scenicStore.spotList?.[0]
+  if (firstSpot?.image_url) return firstSpot.image_url
+  return ''
+})
+
+const menuItems = [
+  { key: 'overview', label: '景区概览', icon: LayoutDashboard },
+  { key: 'spots', label: '景点导览', icon: Landmark },
+  { key: 'routes', label: '游览路线', icon: Route },
+  { key: 'map', label: '景区地图', icon: Map },
+  { key: 'chat', label: '智能问答', icon: MessageSquare },
+  { key: 'announcement', label: '系统公告', icon: Megaphone }
+]
+
+const pageMap = {
+  overview: OverviewPage,
+  spots: SpotsPage,
+  routes: RoutesPage,
+  map: MapPage,
+  chat: ChatPage,
+  announcement: AnnouncementPage
 }
 
-// 动态时间
-const currentTime = ref('');
-const currentDate = ref('');
-let timeInterval;
+const currentPage = computed(() => pageMap[activeMenu.value] || OverviewPage)
 
-const updateTime = () => {
-  const now = new Date();
-  currentTime.value = now.toLocaleTimeString('zh-CN', { hour12: false });
-  currentDate.value = now.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' });
-};
-
-// 弹窗状态
-const versionVisible = ref(false);
-const configVisible = ref(false);
-
-// =========== Canvas 背景粒子特效 ===========
-const particleCanvas = ref(null)
-let animationFrameId = null
-let handleResize = null 
-
-const initParticleCanvas = () => {
-  if (handleResize) window.removeEventListener('resize', handleResize)
-  if (animationFrameId) cancelAnimationFrame(animationFrameId)
-
-  const canvas = particleCanvas.value
-  if (!canvas) return
-  
-  const ctx = canvas.getContext('2d')
-  let particlesArray = []
-  
-  handleResize = () => {
-    canvas.width = window.innerWidth
-    canvas.height = window.innerHeight
-  }
-  window.addEventListener('resize', handleResize)
-  handleResize()
-  
-  class Particle {
-    constructor() {
-      this.x = Math.random() * canvas.width
-      this.y = Math.random() * canvas.height
-      this.size = Math.random() * 2 + 0.5
-      this.speedX = Math.random() * 1 - 0.5
-      this.speedY = Math.random() * 1 - 0.5
-      const theme = document.documentElement.getAttribute('data-theme')
-      if (theme === 'spring_season') {
-        this.color = Math.random() > 0.5 ? '#84cc16' : '#22c55e'
-      } else if (theme === 'summer') {
-        this.color = Math.random() > 0.5 ? '#38bdf8' : '#3b82f6'
-      } else if (theme === 'autumn') {
-        this.color = Math.random() > 0.5 ? '#f97316' : '#f59e0b'
-      } else if (theme === 'winter') {
-        this.color = Math.random() > 0.5 ? '#94a3b8' : '#818cf8'
-      } else {
-        this.color = Math.random() > 0.5 ? '#10b981' : '#34d399'
-      }
-      this.opacity = Math.random() * 0.5 + 0.2
-    }
-    update() {
-      this.x += this.speedX
-      this.y += this.speedY
-      
-      if (this.x > canvas.width || this.x < 0) this.speedX = -this.speedX
-      if (this.y > canvas.height || this.y < 0) this.speedY = -this.speedY
-    }
-    draw() {
-      ctx.globalAlpha = this.opacity
-      ctx.fillStyle = this.color
-      ctx.beginPath()
-      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2)
-      ctx.fill()
-      ctx.globalAlpha = 1
-    }
-  }
-  
-  const init = () => {
-    particlesArray = []
-    const numberOfParticles = (canvas.width * canvas.height) / 15000
-    for (let i = 0; i < numberOfParticles; i++) {
-      particlesArray.push(new Particle())
-    }
-  }
-  
-  const connect = () => {
-    const theme = document.documentElement.getAttribute('data-theme')
-    let strokeColor = '#10b981'
-    if (theme === 'spring_season') strokeColor = '#84cc16'
-    else if (theme === 'summer') strokeColor = '#38bdf8'
-    else if (theme === 'autumn') strokeColor = '#f97316'
-    else if (theme === 'winter') strokeColor = '#94a3b8'
-
-    for (let a = 0; a < particlesArray.length; a++) {
-      for (let b = a; b < particlesArray.length; b++) {
-        const dx = particlesArray[a].x - particlesArray[b].x
-        const dy = particlesArray[a].y - particlesArray[b].y
-        const distance = dx * dx + dy * dy
-        
-        if (distance < 12000) {
-          ctx.globalAlpha = 1 - distance / 12000
-          ctx.strokeStyle = strokeColor
-          ctx.lineWidth = 0.5
-          ctx.beginPath()
-          ctx.moveTo(particlesArray[a].x, particlesArray[a].y)
-          ctx.lineTo(particlesArray[b].x, particlesArray[b].y)
-          ctx.stroke()
-        }
-      }
-    }
-    ctx.globalAlpha = 1
-  }
-  
-  const animate = () => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
-    for (let i = 0; i < particlesArray.length; i++) {
-      particlesArray[i].update()
-      particlesArray[i].draw()
-    }
-    connect()
-    animationFrameId = requestAnimationFrame(animate)
-  }
-  
-  init()
-  animate()
+const openConfig = () => {
+  showConfig.value = true
 }
 
-const startClock = () => {
-  updateTime();
-  timeInterval = setInterval(updateTime, 1000);
+const goAdmin = () => {
+  router.push('/admin')
 }
 
+// 主题加载（原 loadSystemConfig 逻辑，使用 FAY 的 getConfig 接口）
 const loadSystemConfig = async () => {
   try {
     const res = await getConfig('theme')
-    if (res && res.status === 'success' && res.data && res.data.value) {
+    if (res?.status === 'success' && res.data?.value) {
       const theme = res.data.value
-      if (theme === 'default') {
-        document.documentElement.removeAttribute('data-theme')
-      } else {
-        document.documentElement.setAttribute('data-theme', theme)
-      }
-      initParticleCanvas()
+      if (theme === 'default') document.documentElement.removeAttribute('data-theme')
+      else document.documentElement.setAttribute('data-theme', theme)
     }
-  } catch (error) {
-    console.error('获取系统配置失败:', error)
+  } catch (e) {
+    console.error('获取系统配置失败:', e)
   }
 }
 
-onMounted(() => {
-  loadSystemConfig();
-  store.refreshAllData();
-  initParticleCanvas();
-  startClock();
+onMounted(async () => {
+  await loadSystemConfig()
+  await scenicStore.refreshAllData()
 })
 
 onUnmounted(() => {
-  if (handleResize) window.removeEventListener('resize', handleResize)
-  if (animationFrameId) cancelAnimationFrame(animationFrameId)
-  if (timeInterval) clearInterval(timeInterval);
+  avatarStore.destroySDK()
 })
 </script>
 
-<style scoped>
-.tech-bg {
-  background-image: 
-    linear-gradient(rgba(0, 150, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 150, 255, 0.03) 1px, transparent 1px);
-  background-size: 40px 40px;
-  background-position: center center;
+<style lang="scss" scoped>
+.scenic-screen {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  color: #e2e8f0;
 }
 
-.text-shadow-glow {
-  text-shadow: 0 0 10px var(--app-shadow), 0 0 20px rgba(0, 100, 255, 0.5);
+/* 景区背景 */
+.scenic-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 0;
+  filter: brightness(0.92) saturate(1.1);
 }
 
-/* 3D */
-.perspective-\[1500px\] {
-  perspective: 1500px;
-}
-</style>
-
-<style>
-/* 包含原来提取到子组件的公共样式 */
-.tech-card {
-  background: linear-gradient(135deg, rgba(6, 18, 38, 0.8) 0%, rgba(2, 9, 26, 0.9) 100%);
-  border: 1px solid rgba(59, 130, 246, 0.3);
-  box-shadow: inset 0 0 20px rgba(0, 150, 255, 0.05);
-  backdrop-filter: blur(8px);
-  border-radius: 8px;
-  clip-path: polygon(0 15px, 15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%);
+.particle-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
 }
 
-.tech-hex-btn {
-  width: 44px;
-  height: 48px;
-  background: rgba(0, 240, 255, 0.05);
-  border: 1px solid rgba(0, 240, 255, 0.4);
+.top-decor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 72px;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.scan-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+}
+
+.scan-line.primary {
+  top: 64px;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(45, 212, 191, 0.25) 8%,
+    rgba(45, 212, 191, 0.85) 50%,
+    rgba(45, 212, 191, 0.25) 92%,
+    transparent 100%
+  );
+  box-shadow: 0 0 14px rgba(45, 212, 191, 0.45), 0 0 28px rgba(45, 212, 191, 0.2);
+}
+
+.scan-line.primary::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: -1px;
+  height: 4px;
+  width: 90px;
+  background: linear-gradient(90deg, transparent, #5eead4, transparent);
+  border-radius: 2px;
+  filter: blur(3px);
+  animation: scan-sweep 5s linear infinite;
+}
+
+.scan-line.secondary {
+  top: 68px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(45, 212, 191, 0.08) 20%,
+    rgba(45, 212, 191, 0.18) 50%,
+    rgba(45, 212, 191, 0.08) 80%,
+    transparent 100%
+  );
+}
+
+@keyframes scan-sweep {
+  from { left: -90px; }
+  to { left: calc(100% + 90px); }
+}
+
+.scenic-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    /* 顶部：仅顶部窄带暗色，确保导航栏可读 */
+    linear-gradient(180deg, rgba(2, 12, 18, 0.55) 0%, rgba(2, 12, 18, 0) 22%),
+    /* 底部：稍暗托起控件 */
+    linear-gradient(0deg, rgba(2, 12, 18, 0.4) 0%, rgba(2, 12, 18, 0) 28%),
+    /* 左侧中央：数字人区聚光 */
+    radial-gradient(ellipse 55% 70% at 32% 50%, transparent 0%, rgba(2, 12, 18, 0.18) 80%),
+    /* 右侧：内容区压暗，保证右侧卡片文字清晰 */
+    radial-gradient(ellipse 50% 90% at 100% 50%, rgba(2, 12, 18, 0.35) 0%, transparent 70%);
+  z-index: 1;
+}
+
+/* 主布局 */
+.main-layout {
+  position: relative;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 32px;
+  height: calc(100vh - 72px);
+  padding: 24px 32px 32px;
+  box-sizing: border-box;
+}
+
+.avatar-section {
+  position: relative;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
-  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(4px);
-}
-.tech-hex-btn:hover {
-  background: rgba(0, 240, 255, 0.2);
-  border-color: #00f0ff;
-  transform: scale(1.1);
-  box-shadow: 0 0 15px rgba(0, 240, 255, 0.5);
+  min-height: 0;
+  padding-bottom: 20px;
 }
 
-.transform-style-3d {
-  transform-style: preserve-3d;
+.content-section {
+  position: relative;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 4px;
 }
-.origin-left { transform-origin: left center; }
-.origin-right { transform-origin: right center; }
 
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-15px); }
+.content-section::-webkit-scrollbar {
+  width: 4px;
 }
-.animate-float { animation: float 4s ease-in-out infinite; }
 
-@keyframes scanline {
-  0% { top: 0; opacity: 0; }
-  10% { opacity: 1; }
-  90% { opacity: 1; }
-  100% { top: 100%; opacity: 0; }
+.content-section::-webkit-scrollbar-thumb {
+  background: rgba(45, 212, 191, 0.25);
+  border-radius: 2px;
 }
-.animate-scanline { animation: scanline 3s linear infinite; }
 
-@keyframes ripple {
-  0% { transform: scale(0.8); opacity: 1; border-width: 2px; }
-  100% { transform: scale(1.5); opacity: 0; border-width: 0px; }
+/* 面板切换动画 */
+.panel-enter-active,
+.panel-leave-active {
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.animate-ripple-1 { animation: ripple 3s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
-.animate-ripple-2 { animation: ripple 3s cubic-bezier(0.4, 0, 0.2, 1) infinite 1.5s; }
 
-@keyframes pulseCore {
-  0%, 100% { transform: scale(0.9); opacity: 0.6; }
-  50% { transform: scale(1.1); opacity: 1; }
-}
-.animate-pulse-core { animation: pulseCore 2s ease-in-out infinite; }
-
-/* 面板滑出动画 */
-.panel-left-enter-active,
-.panel-left-leave-active {
-  transition: all 0.7s cubic-bezier(0.25, 1, 0.5, 1);
-}
-.panel-left-enter-from,
-.panel-left-leave-to {
+.panel-enter-from {
   opacity: 0;
-  transform: translateX(-100%) scale(0.9);
+  transform: translateX(20px);
 }
 
-.panel-right-enter-active,
-.panel-right-leave-active {
-  transition: all 0.7s cubic-bezier(0.25, 1, 0.5, 1);
-}
-.panel-right-enter-from,
-.panel-right-leave-to {
+.panel-leave-to {
   opacity: 0;
-  transform: translateX(100%) scale(0.9);
+  transform: translateX(-20px);
 }
 
-.custom-scrollbar::-webkit-scrollbar { width: 4px; }
-.custom-scrollbar::-webkit-scrollbar-track { background: rgba(16, 185, 129, 0.05); border-radius: 4px; }
-.custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(16, 185, 129, 0.3); border-radius: 4px; }
-.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(16, 185, 129, 0.6); }
+/* 响应式 */
+@media (max-width: 1280px) {
+  .main-layout {
+    grid-template-columns: 1fr 420px;
+    gap: 24px;
+    padding: 20px 24px 28px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .main-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr auto;
+  }
+
+  .avatar-section {
+    display: none;
+  }
+}
 </style>
